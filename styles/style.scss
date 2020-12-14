@@ -1,0 +1,75 @@
+.game {
+  display: flex;
+}
+
+.game-well {
+  display: flex;
+  flex-wrap: wrap;
+  width: 47.5vh;
+  height: 95vh;
+
+  div {
+    width: 4.75vh;
+    height: 4.75vh;
+  }
+}
+
+.info {
+  width: calc(100vw - 50vh);
+
+  .player-data div {
+    width: 25vh;
+    background-color: lightgray;
+
+    &.level {
+      margin-top: 10px;
+    }
+    
+    p {
+      margin: 0;
+      padding: 15px;
+    }
+  }
+
+  .next,
+  .hold {
+    width: 25vh;
+    height: 25vh;
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    margin-top: 20px;
+
+    .label {
+      position: absolute;
+      top: 0;
+    }
+
+    div {
+      display: flex;
+      flex-wrap: wrap;
+
+      div {
+        width: 4.75vh;
+        height: 4.75vh;
+      }
+    }
+  }
+}
+
+.pause {
+  position: absolute;
+  left: 23.75vh;
+  transform: translate(-50%, 0);
+}
+
+@keyframes flash {
+  0% {
+    background-color: black;
+  }
+  100% {
+    background-color: white;
+  }
+}
