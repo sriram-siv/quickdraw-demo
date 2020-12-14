@@ -33,3 +33,21 @@ export const $Node = ({ type, className, style, children } = {}) => {
   }
   return node
 }
+
+export const useState = (initial, children) => {
+  const state = [
+    {},
+    initial
+  ]
+  draw(state, children)
+  return [
+    state,
+    next => {
+      state[0] = { ...state[1] }
+      state[1] = Object.assign(state[1], next)
+
+      
+      draw(state, children)
+    }
+  ]
+}

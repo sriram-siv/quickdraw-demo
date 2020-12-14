@@ -1,3 +1,5 @@
+import { tetrominoes, offsets } from './objects.js'
+
 export const rotateArray = (array, direction) => {
   const result = Array.from({ length: array.length }, (_, i) => (
     array.reduce((acc, line) => [line[i], ...acc],[])
@@ -5,52 +7,16 @@ export const rotateArray = (array, direction) => {
   return direction === 1 ? result : result.map(line => line.reverse()).reverse()
 }
 
-export const getRandomBlock = () => {
-  const tetrominoes = [
-    [
-      [1, 1],
-      [1, 1]
-    ],
-    [
-      [0, 0, 1],
-      [1, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [1, 0, 0],
-      [1, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 1, 1],
-      [1, 1, 0],
-      [0, 0, 0]
-    ],
-    [
-      [1, 1, 0],
-      [0, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 1, 0],
-      [1, 1, 1],
-      [0, 0, 0]
-    ],
-    [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ]
-  ]
-  return tetrominoes[Math.floor(Math.random() * tetrominoes.length)]
-}
+export const getBlock = () => (
+  tetrominoes[Math.floor(Math.random() * tetrominoes.length)]
+)
 
-export const generateController = () => {
+export const generateController = bindings => {
   const keys = {}
   return {
     getKey: (key) => keys[key],
-    setKey: (key, timer) => keys[key] = timer
+    setKey: (key, timer) => keys[key] = timer,
+    bindings
   }
 }
 
@@ -87,55 +53,51 @@ export const removeLines = prevState => {
     : prevState
 }
 
-export const checkMoveIsValid = (direction, cells) => {
-  const boundaries = { '-1': 0, '1': 9 }
-
-  const activeCells = cells.reduce((acc, cell, i) => (
-    cell === 1 ? acc.concat(i) : acc
-  ), [])
-  
-  if (!activeCells.length || activeCells.some(i => i % 10 === boundaries[direction])) return false
-
-  return activeCells.every(i => cells[i + direction] < 2)
-}
-
-export const checkRotationIsValid = (rotatedPiece, prevState, check = 0) => {
-  // This can be expanded in scope
-  const offsets = [0, 1, -1, -10]
+export const findOffset = (piece, translation, prevState, check = 0) => {
   if (check >= offsets.length) return false
-  
-  const spawnMap = getPlacementMap(rotatedPiece, prevState.fallingPosition + offsets[check])
-  const isFree = spawnMap.every(i => prevState.cells[i] < 2)
-  const inBounds = spawnMap.every(i => i % 10 !== 0) || spawnMap.every(i => i % 10 !== 9)
+  const spawnMap = getPlacementMap(piece, prevState.fallingPosition + translation + offsets[check])
+  const prevSpawn = getPlacementMap(prevState.fallingPiece, prevState.fallingPosition)
 
-  return isFree && inBounds ? offsets[check] : checkRotationIsValid(rotatedPiece, prevState, ++check)
+  const isFree = spawnMap.every(i => prevState.cells[i] < 2)
+  
+  const inBounds = Math.abs(translation) === 1
+    ? spawnMap.every((val, i) => (val % 10) - (prevSpawn[i] % 10) === translation)
+    : spawnMap.every(i => i % 10 !== 0) || spawnMap.every(i => i % 10 !== 9)
+
+  return isFree && inBounds
+    ? offsets[check] : findOffset(piece, translation, prevState, ++check)
 }
 
 export const getPlacementMap = (piece, position) => (
-  piece.map((line, i) => (
-    line.map((cell, j) => cell ? position + (i * 10) + j : 0)
-  )).flat().filter(val => val)
+  piece.block.map((line, i) => (
+    line.map((cell, j) => cell ? position + (i * 10) + j : -1)
+  )).flat().filter(val => val > -1)
 )
 
 export const getCellColor = (cells, index, ghostDistance) => {
-  if (cells[index]) return 'black'
-  if (cells[index - ghostDistance] === 1) return 'grey'
+  if (cells[index]) return 'fill'
+  if (cells[index - ghostDistance] === 1) return 'gray'
   else return 'white'
 }
 
-export const ghost = (cells, dropDistance = 0) => (
-  checkMoveIsValid(dropDistance + 10, cells)
-    ? ghost(cells, dropDistance + 10)
+export const ghost = (state, dropDistance = 0) => (
+  findOffset(state.fallingPiece, dropDistance + 10, state) === 0
+    ? ghost(state, dropDistance + 10)
     : dropDistance
 )
 
-export const flashLines = ({ newLines }, displayCells) => {
-  newLines.forEach(line => {
+export const flashLines = state => {
+  const displayCells = Array.from(document.querySelector('.game-well').children)
+  
+  state[1].newLines.forEach(line => {
     const cells = getLine(--line, displayCells)
     cells.forEach(cell => cell.style.animation = 'flash 0.3s forwards')
   })
+
+  const speedUp = state[1].newLines.length ? 300 : 0
+
   return delayedFunction => setTimeout(() => {
-    delayedFunction()
+    delayedFunction(state[1], speedUp)
     displayCells.forEach(cell => cell.style.animation = '')
   }, 300)
 }
@@ -149,6 +111,7 @@ export const alterCells = (prevValue, newValue, prevState) => ({
 export const placePiece = prevState => {
   const { fallingPiece, fallingPosition } = prevState
   const spawnMap = getPlacementMap(fallingPiece, fallingPosition)
+  
   const cells = alterCells(1, 0, prevState).cells.map((cell, i) => spawnMap.includes(i) ? 1 : cell)
   
   return {
@@ -158,17 +121,22 @@ export const placePiece = prevState => {
 }
 
 export const move = (translation, prevState) => {
-  return checkMoveIsValid(translation, prevState.cells)
-    ? placePiece({
+  const offset = findOffset(prevState.fallingPiece, translation, prevState)
+  return offset === false
+    ? prevState
+    : placePiece({
       ...prevState,
       fallingPosition: prevState.fallingPosition += translation
     })
-    : prevState
 }
 
 export const rotate = (direction, prevState) => {
-  const rotatedPiece = rotateArray(prevState.fallingPiece, direction)
-  const offset = checkRotationIsValid(rotatedPiece, prevState)
+  const rotatedPiece = {
+    block: rotateArray(prevState.fallingPiece.block, direction),
+    color: prevState.fallingPiece.color
+  }
+
+  const offset = findOffset(rotatedPiece, 0, prevState)
 
   return offset === false
     ? prevState
@@ -183,24 +151,31 @@ export const spawnBlock = prevState => ({
   ...prevState,
   fallingPosition: 4,
   fallingPiece: prevState.nextPiece,
-  nextPiece: getRandomBlock()
+  nextPiece: getBlock()
 })
 
-export const hold = (_, prevState) => (
-  placePiece({
+export const hold = (_, prevState) => {
+
+  const offset = findOffset(prevState.holdPiece || prevState.nextPiece, 0, prevState)
+
+  if (offset === false) return prevState
+
+  return placePiece({
     ...prevState,
     holdPiece: prevState.fallingPiece,
     fallingPiece: prevState.holdPiece ?? prevState.nextPiece,
-    nextPiece: prevState.holdPiece ? prevState.nextPiece : getRandomBlock()
+    nextPiece: prevState.holdPiece ? prevState.nextPiece : getBlock(),
+    fallingPosition: prevState.fallingPosition + offset
   })
-)
+}
 
-export const pause = (loopFunction, prevState) => {
-  const level = Math.floor(prevState.lines / 10) * 10
+export const pause = (loopFunction, prevState, speedUp = 0) => {
   clearInterval(prevState.timer)
+  const delay = Math.max(0, 1000 - (Math.floor(prevState.lines / 10) * 100) - speedUp)
+
   return {
     ...prevState,
-    timer: prevState.timer ? null : setInterval(loopFunction, 1000 - (level * 10))
+    timer: prevState.timer ? null : setInterval(loopFunction, delay)
   }
 }
 
