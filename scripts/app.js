@@ -66,6 +66,7 @@ const init = () => {
   const state = [
     {},
     {
+      // cells: Array.from({ length: 210 }, () => ({ value: 0 })),
       cells: Array.from({ length: 210 }, () => 0),
       fallingPosition: 4,
       fallingPiece: getRandomBlock(),

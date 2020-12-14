@@ -10,7 +10,7 @@ export const hasUpdated = ([prev, next], dependencies) => (
 )
 
 export const stateValue = (state, keys) => {
-  return keys.split('.').reduce((acc, key) => acc[key] || acc, state)
+  return keys.split('.').reduce((acc, key) => acc[key] ?? acc, state)
 }
 
 export const draw = (state, components) => {
