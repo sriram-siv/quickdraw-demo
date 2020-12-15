@@ -40,7 +40,9 @@ export const board = (state, deps) => {
     if (cells[i]) {
       // Add new ghost
       const position = i - 10 + ghost(state[1])
-      element.children[position].style.backgroundColor = styles.ghost
+      if (position < 200) {
+        element.children[position].style.backgroundColor = styles.ghost
+      } else console.log('missing element at: ', position)
     }
 
     if (i > 10) {

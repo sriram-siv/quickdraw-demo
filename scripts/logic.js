@@ -53,7 +53,7 @@ export const removeLines = prevState => {
     : prevState
 }
 
-export const findOffset = (piece, translation, prevState, check = 0) => {
+export const findOffset = (piece, translation, prevState, check = 0, debug = false) => {
   if (check >= offsets.length) return false
   const spawnMap = getPlacementMap(piece, prevState.fallingPosition + translation + offsets[check])
   const prevSpawn = getPlacementMap(prevState.fallingPiece, prevState.fallingPosition)
@@ -65,7 +65,7 @@ export const findOffset = (piece, translation, prevState, check = 0) => {
     : spawnMap.every(i => i % 10 !== 0) || spawnMap.every(i => i % 10 !== 9)
 
   return isFree && inBounds
-    ? offsets[check] : findOffset(piece, translation, prevState, ++check)
+    ? offsets[check] : findOffset(piece, translation, prevState, ++check, debug)
 }
 
 export const getPlacementMap = (piece, position) => (
@@ -114,31 +114,30 @@ export const placePiece = prevState => {
   }
 }
 
-export const move = (translation, prevState) => {
-  const offset = findOffset(prevState.fallingPiece, translation, prevState)
-  if (offset === false) console.log(prevState.cells)
+export const move = (translation, [prev, current]) => {
+  const offset = findOffset(current.fallingPiece, translation, current)
   return offset === false
-    ? prevState
+    ? current
     : placePiece({
-      ...prevState,
-      fallingPosition: prevState.fallingPosition += translation
+      ...current,
+      fallingPosition: current.fallingPosition += translation
     })
 }
 
-export const rotate = (direction, prevState) => {
+export const rotate = (direction, [prev, current]) => {
   const rotatedPiece = {
-    block: rotateArray(prevState.fallingPiece.block, direction),
-    color: prevState.fallingPiece.color
+    block: rotateArray(current.fallingPiece.block, direction),
+    color: current.fallingPiece.color
   }
 
-  const offset = findOffset(rotatedPiece, 0, prevState)
+  const offset = findOffset(rotatedPiece, 0, current)
 
   return offset === false
-    ? prevState
+    ? current
     : placePiece({
-      ...prevState,
+      ...current,
       fallingPiece: rotatedPiece,
-      fallingPosition: prevState.fallingPosition + offset
+      fallingPosition: current.fallingPosition + offset
     })
 }
 
@@ -149,18 +148,18 @@ export const spawnBlock = prevState => ({
   nextPiece: getBlock()
 })
 
-export const hold = (_, prevState) => {
+export const hold = (_, [prev, current]) => {
 
-  const offset = findOffset(prevState.holdPiece || prevState.nextPiece, 0, prevState)
+  const offset = findOffset(current.holdPiece || current.nextPiece, 0, current)
 
-  if (offset === false) return prevState
+  if (offset === false) return current
 
   return placePiece({
-    ...prevState,
-    holdPiece: prevState.fallingPiece,
-    fallingPiece: prevState.holdPiece || prevState.nextPiece,
-    nextPiece: prevState.holdPiece ? prevState.nextPiece : getBlock(),
-    fallingPosition: prevState.fallingPosition + offset
+    ...current,
+    holdPiece: current.fallingPiece,
+    fallingPiece: current.holdPiece || current.nextPiece,
+    nextPiece: current.holdPiece ? current.nextPiece : getBlock(),
+    fallingPosition: current.fallingPosition + offset
   })
 }
 

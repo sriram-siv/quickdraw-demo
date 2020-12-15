@@ -14,7 +14,8 @@ import {
   flashLines,
   spawnBlock,
   pause,
-  updateScore
+  updateScore,
+  getPlacementMap
 } from './logic.js'
 
 import {
@@ -34,7 +35,7 @@ const init = () => {
 
   const gameLoop = () => {
     if (findOffset(state[1].fallingPiece, 10, state[1]) === 0) {
-      setState((move(10, state[1])))
+      setState((move(10, state)))
       return
     }
     // Else
@@ -70,13 +71,13 @@ const init = () => {
     ArrowRight: [1, 100, move],
     ArrowDown: [10, 100, move],
     ArrowUp: [null, 1000,
-      () => alterCells(1, 2, move(ghost(state[1]), state[1]))],
+      () => alterCells(1, 2, move(ghost(state[1]), state))],
     z: [-1, 200, rotate],
     x: [1, 200, rotate],
     Shift: [null, 500, hold],
     Escape: [null, 1000, () => setState(pause(gameLoop, state[1]))]
   })
-  
+
   window.addEventListener('keyup', ({ key }) => {
     clearInterval(controller.getKey(key))
     controller.setKey(key, null)
@@ -89,7 +90,16 @@ const init = () => {
     if (!controller.getKey(key) && controller.bindings[key]) {
       const [value, delay, action] = controller.bindings[key]
       controller.setKey(key, startInterval(() => {
-        setState(action(value, state[1]))
+
+        const newState = action(value, state)
+
+        const placement = getPlacementMap(newState.fallingPiece, newState.fallingPosition)
+        const outBounds = placement.some(i => i >= 210)
+        const collision = placement.some(i => state[1].cells[i] === 2)
+        
+        if (!outBounds && !collision) {
+          setState(newState)
+        }
       }, delay))
     }
   })

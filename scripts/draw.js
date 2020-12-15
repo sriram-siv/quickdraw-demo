@@ -53,8 +53,10 @@ export const useState = (initial, children) => {
   return [
     state,
     next => {
+
       state[0] = { ...state[1] }
       state[1] = Object.assign(state[1], next)
+
       // const t0 = performance.now()
       draw(state, children, root)
       // console.log(performance.now() - t0)
