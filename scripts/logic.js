@@ -74,12 +74,6 @@ export const getPlacementMap = (piece, position) => (
   )).flat().filter(val => val > -1)
 )
 
-export const getCellColor = (cells, index, ghostDistance) => {
-  if (cells[index]) return 'fill'
-  if (cells[index - ghostDistance] === 1) return 'gray'
-  else return 'white'
-}
-
 export const ghost = (state, dropDistance = 0) => (
   findOffset(state.fallingPiece, dropDistance + 10, state) === 0
     ? ghost(state, dropDistance + 10)

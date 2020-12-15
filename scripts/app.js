@@ -20,7 +20,8 @@ import {
 import {
   board,
   preview,
-  playerData
+  playerData,
+  info
 } from './components.js'
 
 import {
@@ -62,9 +63,7 @@ const init = () => {
     },
     [
       { component: board, deps: ['cells'] },
-      { component: playerData, deps: ['lines', 'score'] },
-      { component: preview, deps: ['nextPiece'], args: { className: 'next', piece: 'nextPiece' } },
-      { component: preview, deps: ['holdPiece'], args: { className: 'hold', piece: 'holdPiece' } }
+      { component: info, deps: [ 'lines', 'score', 'nextPiece', 'holdPiece'] }
     ]
   )
 

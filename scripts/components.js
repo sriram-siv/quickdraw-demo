@@ -1,40 +1,48 @@
 import { $Node } from './draw.js'
-import { ghost, getCellColor } from './logic.js'
+import { ghost } from './logic.js'
 
 export const board = state => {
   const { cells: prevCells } = state[0]
-  const { cells } = state[1]
-
+  const { cells, fallingPiece, newLines } = state[1]
 
   const well = document.querySelector('.game-well')
-
   if (!well.children.length) {
     Array.from({ length: 200 }).forEach(() => well.appendChild($Node()))
     return
   }
 
-  Array.from(well.children).forEach((cell, i) => {
+  // Could fix clear lines animation here somehow ??
+  if (newLines.length) {
+    console.log(newLines.length)
+  }
 
-    const fill = getCellColor(cells, i + 10, ghost(state[1]))
-    const color = fill === 'fill'
-      ? state[1].fallingPiece.color : fill
+  const cellsToUpdate = cells.reduce((acc, cell, i) => {
+    return prevCells[i] !== cell || cell === 1 ? acc.concat(i) : acc
+  }, [])
 
-    const update = cells[i + 10] === 1
-      || fill !== getCellColor(prevCells, i + 10, ghost(state[0]))
-      || cell.style.backgroundColor === 'gray'
-      || fill === 'gray'
-    
-    if (update) {
-      cell.style.backgroundColor = color
+  // Remove previous ghost
+  cells.slice(10).reduce((acc, cell, i) => (
+    well.children[i].style.backgroundColor === 'gray' ? acc.concat(i) : acc
+  ), []).forEach(i => well.children[i].style.backgroundColor = 'white')
+
+  cellsToUpdate.forEach(i => {
+    if (cells[i]) {
+      // Add new ghost
+      const position = i - 10 + ghost(state[1])
+      well.children[position].style.backgroundColor = 'gray'
+    }
+
+    if (i > 10) {
+      well.children[i - 10].style.backgroundColor = cells[i]
+        ? fallingPiece.color : 'white'
     }
   })
-
 }
 
 export const preview = (state, { className, piece }) => {
   const next = state[1]
  
-  const element = $Node({
+  return $Node({
     className, children:
     [
       $Node({ type: 'p', className: 'label', children: [className.toUpperCase()] }),
@@ -49,7 +57,6 @@ export const preview = (state, { className, piece }) => {
       })
     ]
   })
-  document.querySelector(`.${className}`).replaceWith(element)
 }
 
 export const playerData = state => {
@@ -65,13 +72,9 @@ export const playerData = state => {
   //  ? element
   //  : querySelector('player-data)
 
-  const nested = $Node({ style: { backgroundColor: 'red', height: '20px' } })
-
-
-  const element = $Node({
+  return $Node({
     className: 'player-data', children:
       [
-        nested,
         $Node({
           className: 'level',
           children:
@@ -89,14 +92,22 @@ export const playerData = state => {
         })
       ]
   })
-  document.querySelector('.player-data').replaceWith(element)
 }
 
 export const info = state => {
   // if deps.updated
-  // querySelector('.info').replace($Node({ children: [
-  //   playerData(state),
-  //   preview(next)
-  //   preview(hold)
-  // ]}))
+
+  const element = document.querySelector('.info')
+
+  const inner = $Node({
+    className: 'info',
+    children:
+      [
+        playerData(state),
+        preview(state, { className: 'next', piece: 'nextPiece' }),
+        preview(state, { className: 'hold', piece: 'holdPiece' })
+      ]
+  })
+
+  element.replaceWith(inner)
 }

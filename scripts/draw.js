@@ -4,18 +4,28 @@
  * @param {Array} dependencies 
  */
 export const hasUpdated = ([prev, next], dependencies) => (
-  dependencies.some(key => (
-    stateValue(prev, key) !== stateValue(next, key)
-  ))
+  dependencies.some(key => {
+    const prevValue = stateValue(prev, key) //.flat().reduce( , )
+    const nextValue = stateValue(next, key)
+    const prevKeys = Object.keys(prevValue)
+    const nextKeys = Object.keys(nextValue)
+
+    return typeof(prevValue) === 'object'
+      ? prevKeys.length !== nextKeys.length || hasUpdated([prevValue, nextValue], prevKeys)
+      : prevValue !== nextValue
+  })
 )
 
 export const stateValue = (state, keys) => {
-  return keys.split('.').reduce((acc, key) => acc[key] ?? acc, state)
+  return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
 }
 
 export const draw = (state, components) => {
   components.forEach(({ component, deps, args }) => {
-    if (hasUpdated(state, deps)) component(state, args)
+    if (hasUpdated(state, deps)) {
+      // console.log('updating', component.name)
+      component(state, args)
+    }
   })
 }
 
@@ -46,8 +56,10 @@ export const useState = (initial, children) => {
       state[0] = { ...state[1] }
       state[1] = Object.assign(state[1], next)
 
-      
+      // const t0 = performance.now()
       draw(state, children)
+      // const delta = performance.now() - t0
+      // console.log(delta)
     }
   ]
 }
