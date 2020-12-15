@@ -41,16 +41,16 @@ export const findCompleteLines = prevState => ({
   ), [])
 })
 
-export const removeLines = prevState => {
+export const removeLines = (prevState, lineCount = 0) => {
   const { cells, newLines } = prevState
-  return newLines.length
+
+  return newLines.length > lineCount
     ? removeLines({
       ...prevState,
       cells: cells.map((cell, i) => (
-        lineNumber(i) > newLines[0] ? cell : cells[i - 10] || 0
-      )),
-      newLines: newLines.slice(1)
-    })
+        lineNumber(i) > newLines[lineCount] ? cell : cells[i - 10] || 0
+      ))
+    }, ++lineCount)
     : prevState
 }
 
@@ -86,15 +86,15 @@ export const flashLines = state => {
   
   state[1].newLines.forEach(line => {
     const cells = getLine(--line, displayCells)
-    cells.forEach(cell => cell.style.animation = 'flash 0.3s forwards')
+    cells.forEach(cell => cell.style.animation = 'flash 0.2s forwards')
   })
 
-  const speedUp = state[1].newLines.length ? 300 : 0
+  // const speedUp = state[1].newLines.length ? 300 : 0
 
-  return delayedFunction => setTimeout(() => {
-    delayedFunction(state[1], speedUp)
-    displayCells.forEach(cell => cell.style.animation = '')
-  }, 300)
+  // return delayedFunction => setTimeout(() => {
+  //   delayedFunction(state[1], speedUp)
+  //   displayCells.forEach(cell => cell.style.animation = '')
+  // }, 300)
 }
 
 export const alterCells = (prevValue, newValue, prevState) => ({

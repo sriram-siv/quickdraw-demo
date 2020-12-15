@@ -39,19 +39,29 @@ const init = () => {
       return
     }
     // Else
-    setState(pause(gameLoop, findCompleteLines(alterCells(1, 2, state[1]))))
-    flashLines(state)((nextState, speedUp) => {
-      // Delayed function call returned from flashLines
-      setState({
-        ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(nextState)))), speedUp)
-      })
-    })
+    // Working version
+    // setState(pause(gameLoop, findCompleteLines(alterCells(1, 2, state[1]))))
+    // flashLines(state)((nextState, speedUp) => {
+    //   // Delayed function call returned from flashLines
+    //   setState({
+    //     ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(nextState)))), speedUp)
+    //   })
+    // })
 
-    // Instead
-    // findCompleteLines
-    // timeout - removeLines - 300
-    // drawBoard applies animation to completeLines
-    // 
+
+    setState(pause(gameLoop,
+      placePiece(spawnBlock(findCompleteLines(alterCells(1, 2, state[1]))))))
+
+    flashLines(state)
+
+    setTimeout(() => {
+      setState({
+        ...pause(gameLoop, removeLines(updateScore(state[1]))),
+        newLines: []
+      })
+    }, 200)
+
+    // if it works, can remove speedUp param from pause
   }
 
   const [state, setState] = useState(
@@ -72,7 +82,16 @@ const init = () => {
     ]
   )
 
-  const cloneState = state
+  const controllerMoveValid = (current, next) => {
+    // newStates cells must be rechecked due to asynchronous call
+    const placement = getPlacementMap(next.fallingPiece, next.fallingPosition)
+    const outBounds = placement.some(i => i >= 210)
+    const collision = placement.some(i => current.cells[i] === 2)
+    const cloning = current.cells.every(cell => cell !== 1)
+      && next.cells.some(cell => cell === 1)
+    
+    return !outBounds && !collision && !cloning
+  }
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
@@ -99,20 +118,9 @@ const init = () => {
       const [value, delay, action] = controller.bindings[key]
       controller.set(key, () => {
         const newState = action(value, state)
-
-
-        
-        
-        // newStates cells must be rechecked due to asynchronous call
-        const placement = getPlacementMap(newState.fallingPiece, newState.fallingPosition)
-        const outBounds = placement.some(i => i >= 210)
-        const collision = placement.some(i => state[1].cells[i] === 2)
-        const cloning = state[1].cells.every(cell => cell !== 1)
-          && newState.cells.some(cell => cell === 1)
-        
-        if (outBounds || collision || cloning) return
-        
-        setState(newState)
+        if (controllerMoveValid(state[1], newState)) {
+          setState(newState)
+        }
       }, delay)
     }
   })

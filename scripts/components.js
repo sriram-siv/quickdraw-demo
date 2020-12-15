@@ -9,8 +9,8 @@ export const board = (state, deps) => {
     if (element) return element
   }
 
-  const { cells: prevCells } = state[0]
-  const { cells, fallingPiece, newLines } = state[1]
+  const { cells: prevCells, newLines } = state[0]
+  const { cells, fallingPiece } = state[1]
 
   // Initialize
   if (!prevCells) {
@@ -22,9 +22,19 @@ export const board = (state, deps) => {
     })
   }
 
+  // Probably better to store the colors
+
+  // Or make a copy of the array and copy the values from that
+
   // Could fix clear lines animation here somehow ??
   if (newLines.length) {
-    console.log(newLines.length)
+    // const children = Array.from(element.children).reverse()
+    // children.forEach((cell, i, arr) => {
+    //   cell.style.animation = ''
+    //   const cellAbove = arr[i + 10]
+
+    //   cell.style.backgroundColor = cellAbove?.style.backgroundColor || 'white'
+    // })
   }
 
   const cellsToUpdate = cells.reduce((acc, cell, i) => {
