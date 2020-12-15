@@ -1,19 +1,25 @@
-import { $Node } from './draw.js'
+import { $Node, hasUpdated } from './draw.js'
 import { ghost } from './logic.js'
 import { styles } from './objects.js'
 
-export const board = state => {
+export const board = (state, deps) => {
+  const element = document.querySelector('.game-well')
+  // Update
+  if (!hasUpdated(state, deps)) {
+    if (element) return element
+  }
+
   const { cells: prevCells } = state[0]
   const { cells, fallingPiece, newLines } = state[1]
 
-  const well = document.querySelector('.game-well')
-  if (!well.children.length) {
-    Array.from({ length: 200 }).forEach(() => well.appendChild($Node({
-      style: {
-        backgroundColor: styles.background
-      }
-    })))
-    return
+  // Initialize
+  if (!prevCells) {
+    return $Node({
+      className: 'game-well',
+      children: Array.from({ length: 200 }, () => (
+        $Node({ style: { backgroundColor: styles.background } })
+      ))
+    })
   }
 
   // Could fix clear lines animation here somehow ??
@@ -27,24 +33,31 @@ export const board = state => {
 
   // Remove previous ghost
   cells.slice(10).reduce((acc, cell, i) => (
-    well.children[i].style.backgroundColor === styles.ghost ? acc.concat(i) : acc
-  ), []).forEach(i => well.children[i].style.backgroundColor = styles.background)
+    element.children[i].style.backgroundColor === styles.ghost ? acc.concat(i) : acc
+  ), []).forEach(i => element.children[i].style.backgroundColor = styles.background)
 
   cellsToUpdate.forEach(i => {
     if (cells[i]) {
       // Add new ghost
       const position = i - 10 + ghost(state[1])
-      well.children[position].style.backgroundColor = styles.ghost
+      element.children[position].style.backgroundColor = styles.ghost
     }
 
     if (i > 10) {
-      well.children[i - 10].style.backgroundColor = cells[i]
+      element.children[i - 10].style.backgroundColor = cells[i]
         ? fallingPiece.color : styles.background
     }
   })
+
+  return element
 }
 
 export const preview = (state, { className, piece }) => {
+  if (!hasUpdated(state, [piece])) { 
+    const element = document.querySelector(piece)
+    if (element) return element
+  }
+
   const next = state[1]
  
   return $Node({
@@ -57,7 +70,7 @@ export const preview = (state, { className, piece }) => {
           width: `${next[piece]?.block.length * 4.75}vh`
         },
         children: next[piece]?.block.flat().map(cell => (
-          $Node({ style: { backgroundColor: cell ? next[piece].color : 'lightgray' } })
+          $Node({ style: { backgroundColor: cell ? next[piece].color : styles.background } })
         ))
       })
     ]
@@ -65,17 +78,13 @@ export const preview = (state, { className, piece }) => {
 }
 
 export const playerData = state => {
+  if (!hasUpdated(state, ['level', 'lines', 'score'])) {
+    const element = document.querySelector('.player-data')
+    if (element) return element
+  }
 
-  // include deps -> conditionally render
-  // would need -- on mount -> create node
-
-  const level = Math.floor(state[1].lines / 10)
-  const lines = state[1].lines
-  const score = state[1].score
-
-  // deps.some(hasUpdated)
-  //  ? element
-  //  : querySelector('player-data)
+  const { lines, score } = state[1]
+  const level = Math.floor(lines / 10)
 
   return $Node({
     className: 'player-data', children:
@@ -99,21 +108,24 @@ export const playerData = state => {
   })
 }
 
-export const info = state => {
-  // if deps.updated
-  // could use draw() like render to return a html element
+export const info = (state, deps) => {
+  if (!hasUpdated(state, deps)) {
+    const element = document.querySelector('.info')
+    if (element) return element
+  }
 
-  const element = document.querySelector('.info')
-
-  const inner = $Node({
+  return $Node({
     className: 'info',
     children:
-      [
-        playerData(state),
-        preview(state, { className: 'next', piece: 'nextPiece' }),
-        preview(state, { className: 'hold', piece: 'holdPiece' })
-      ]
+    [
+      playerData(state),
+      preview(state, { className: 'next', piece: 'nextPiece' }),
+      preview(state, { className: 'hold', piece: 'holdPiece' })
+    ]
   })
-
-  element.replaceWith(inner)
+  // return draw(state, [
+  //   { component: playerData },
+  //   { component: preview, args: { className: 'next', piece: 'nextPiece' } },
+  //   { component: preview, args: { className: 'hold', piece: 'holdPiece' } }
+  // ], $Node({ className: 'info' }))
 }

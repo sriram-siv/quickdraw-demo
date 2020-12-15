@@ -116,6 +116,7 @@ export const placePiece = prevState => {
 
 export const move = (translation, prevState) => {
   const offset = findOffset(prevState.fallingPiece, translation, prevState)
+  if (offset === false) console.log(prevState.cells)
   return offset === false
     ? prevState
     : placePiece({

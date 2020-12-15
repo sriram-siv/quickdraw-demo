@@ -27,8 +27,7 @@ body {
   width: 25vh;
 
   .player-data div {
-    // width: 25vh;
-    background-color: lightgray;
+    background-color: white;
     
     p {
       margin: 0;
@@ -39,7 +38,7 @@ body {
   .next,
   .hold {
     height: 25vh;
-    background-color: lightgray;
+    background-color: white;
     display: flex;
     justify-content: center;
     align-items: flex-end;

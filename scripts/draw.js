@@ -5,27 +5,26 @@
  */
 export const hasUpdated = ([prev, next], dependencies) => (
   dependencies.some(key => {
-    const prevValue = stateValue(prev, key) //.flat().reduce( , )
+    const prevValue = stateValue(prev, key)
     const nextValue = stateValue(next, key)
     const prevKeys = Object.keys(prevValue)
     const nextKeys = Object.keys(nextValue)
 
-    return typeof(prevValue) === 'object'
+    return typeof(nextValue) === 'object'
       ? prevKeys.length !== nextKeys.length || hasUpdated([prevValue, nextValue], prevKeys)
       : prevValue !== nextValue
   })
 )
 
+// can take a nested key in the form < 'key.subKey' >
 export const stateValue = (state, keys) => {
   return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
 }
 
-export const draw = (state, components) => {
-  components.forEach(({ component, deps, args }) => {
-    if (hasUpdated(state, deps)) {
-      // console.log('updating', component.name)
-      component(state, args)
-    }
+export const draw = (state, components, root) => {
+  components.map(({ component, deps, args }, i) => {
+    const child = component(state, deps, args)
+    root.children[i].replaceWith(child)
   })
 }
 
@@ -45,21 +44,20 @@ export const $Node = ({ type, className, style, children } = {}) => {
 }
 
 export const useState = (initial, children) => {
+  const root = document.querySelector('.game')
   const state = [
     {},
     initial
   ]
-  draw(state, children)
+  draw(state, children, root)
   return [
     state,
     next => {
       state[0] = { ...state[1] }
       state[1] = Object.assign(state[1], next)
-
       // const t0 = performance.now()
-      draw(state, children)
-      // const delta = performance.now() - t0
-      // console.log(delta)
+      draw(state, children, root)
+      // console.log(performance.now() - t0)
     }
   ]
 }
