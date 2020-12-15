@@ -157,7 +157,7 @@ export const hold = (_, prevState) => {
   return placePiece({
     ...prevState,
     holdPiece: prevState.fallingPiece,
-    fallingPiece: prevState.holdPiece ?? prevState.nextPiece,
+    fallingPiece: prevState.holdPiece || prevState.nextPiece,
     nextPiece: prevState.holdPiece ? prevState.nextPiece : getBlock(),
     fallingPosition: prevState.fallingPosition + offset
   })

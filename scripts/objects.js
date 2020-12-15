@@ -52,3 +52,8 @@ export const tetrominoes = [
 
 // This can be expanded in scope
 export const offsets = [0, 1, -1, -10]
+
+export const styles = {
+  background: 'white',
+  ghost: 'gray'
+}

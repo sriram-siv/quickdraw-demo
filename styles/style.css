@@ -1,11 +1,19 @@
+body {
+  background-color: #333;
+  margin: 0;
+}
+
 .game {
   display: flex;
+  padding: 2.5vh 10px;
+  width: fit-content;
+  margin: auto;
 }
 
 .game-well {
   display: flex;
   flex-wrap: wrap;
-  width: 47.5vh;
+  width: 50vh;
   height: 95vh;
 }
 .game-well div {
@@ -14,29 +22,24 @@
 }
 
 .info {
-  width: calc(100vw - 50vh);
+  width: 25vh;
 }
 .info .player-data div {
-  width: 25vh;
   background-color: lightgray;
-}
-.info .player-data div.level {
-  margin-top: 10px;
 }
 .info .player-data div p {
   margin: 0;
-  padding: 15px;
+  padding: 10px;
 }
 .info .next,
 .info .hold {
-  width: 25vh;
   height: 25vh;
   background-color: lightgray;
   display: flex;
   justify-content: center;
   align-items: flex-end;
   position: relative;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 .info .next .label,
 .info .hold .label {

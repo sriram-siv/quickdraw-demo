@@ -1,11 +1,20 @@
+
+body {
+  background-color: #333;
+  margin: 0;
+}
+
 .game {
   display: flex;
+  padding: 2.5vh 10px;
+  width: fit-content;
+  margin: auto;
 }
 
 .game-well {
   display: flex;
   flex-wrap: wrap;
-  width: 47.5vh;
+  width: 50vh;
   height: 95vh;
 
   div {
@@ -15,32 +24,27 @@
 }
 
 .info {
-  width: calc(100vw - 50vh);
+  width: 25vh;
 
   .player-data div {
-    width: 25vh;
+    // width: 25vh;
     background-color: lightgray;
-
-    &.level {
-      margin-top: 10px;
-    }
     
     p {
       margin: 0;
-      padding: 15px;
+      padding: 10px;
     }
   }
 
   .next,
   .hold {
-    width: 25vh;
     height: 25vh;
     background-color: lightgray;
     display: flex;
     justify-content: center;
     align-items: flex-end;
     position: relative;
-    margin-top: 20px;
+    margin-top: 10px;
 
     .label {
       position: absolute;

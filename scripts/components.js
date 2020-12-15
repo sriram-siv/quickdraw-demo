@@ -1,5 +1,6 @@
 import { $Node } from './draw.js'
 import { ghost } from './logic.js'
+import { styles } from './objects.js'
 
 export const board = state => {
   const { cells: prevCells } = state[0]
@@ -7,7 +8,11 @@ export const board = state => {
 
   const well = document.querySelector('.game-well')
   if (!well.children.length) {
-    Array.from({ length: 200 }).forEach(() => well.appendChild($Node()))
+    Array.from({ length: 200 }).forEach(() => well.appendChild($Node({
+      style: {
+        backgroundColor: styles.background
+      }
+    })))
     return
   }
 
@@ -22,19 +27,19 @@ export const board = state => {
 
   // Remove previous ghost
   cells.slice(10).reduce((acc, cell, i) => (
-    well.children[i].style.backgroundColor === 'gray' ? acc.concat(i) : acc
-  ), []).forEach(i => well.children[i].style.backgroundColor = 'white')
+    well.children[i].style.backgroundColor === styles.ghost ? acc.concat(i) : acc
+  ), []).forEach(i => well.children[i].style.backgroundColor = styles.background)
 
   cellsToUpdate.forEach(i => {
     if (cells[i]) {
       // Add new ghost
       const position = i - 10 + ghost(state[1])
-      well.children[position].style.backgroundColor = 'gray'
+      well.children[position].style.backgroundColor = styles.ghost
     }
 
     if (i > 10) {
       well.children[i - 10].style.backgroundColor = cells[i]
-        ? fallingPiece.color : 'white'
+        ? fallingPiece.color : styles.background
     }
   })
 }
@@ -96,6 +101,7 @@ export const playerData = state => {
 
 export const info = state => {
   // if deps.updated
+  // could use draw() like render to return a html element
 
   const element = document.querySelector('.info')
 

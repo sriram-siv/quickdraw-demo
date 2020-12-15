@@ -19,8 +19,6 @@ import {
 
 import {
   board,
-  preview,
-  playerData,
   info
 } from './components.js'
 
@@ -62,7 +60,7 @@ const init = () => {
       timer: setInterval(gameLoop, 1000)
     },
     [
-      { component: board, deps: ['cells'] },
+      { component: board, deps: ['cells', 'newLines'] },
       { component: info, deps: [ 'lines', 'score', 'nextPiece', 'holdPiece'] }
     ]
   )
