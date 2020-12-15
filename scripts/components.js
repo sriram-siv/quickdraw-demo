@@ -45,7 +45,7 @@ export const board = (state, deps) => {
       } else console.log('missing element at: ', position)
     }
 
-    if (i > 10) {
+    if (i >= 10) {
       element.children[i - 10].style.backgroundColor = cells[i]
         ? fallingPiece.color : styles.background
     }

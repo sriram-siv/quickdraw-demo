@@ -46,6 +46,12 @@ const init = () => {
         ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(nextState)))), speedUp)
       })
     })
+
+    // Instead
+    // findCompleteLines
+    // timeout - removeLines - 300
+    // drawBoard applies animation to completeLines
+    // 
   }
 
   const [state, setState] = useState(
@@ -66,6 +72,8 @@ const init = () => {
     ]
   )
 
+  const cloneState = state
+
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
     ArrowRight: [1, 100, move],
@@ -79,28 +87,33 @@ const init = () => {
   })
 
   window.addEventListener('keyup', ({ key }) => {
-    clearInterval(controller.getKey(key))
-    controller.setKey(key, null)
+    clearInterval(controller.get(key))
+    controller.clear(key, null)
   })
 
   window.addEventListener('keydown', ({ key }) => {
     // Only allow unpause in paused state
     if (key !== 'Escape' && !state[1].timer) return
     
-    if (!controller.getKey(key) && controller.bindings[key]) {
+    if (!controller.get(key) && controller.bindings[key]) {
       const [value, delay, action] = controller.bindings[key]
-      controller.setKey(key, startInterval(() => {
-
+      controller.set(key, () => {
         const newState = action(value, state)
 
+
+        
+        
+        // newStates cells must be rechecked due to asynchronous call
         const placement = getPlacementMap(newState.fallingPiece, newState.fallingPosition)
         const outBounds = placement.some(i => i >= 210)
         const collision = placement.some(i => state[1].cells[i] === 2)
+        const cloning = state[1].cells.every(cell => cell !== 1)
+          && newState.cells.some(cell => cell === 1)
         
-        if (!outBounds && !collision) {
-          setState(newState)
-        }
-      }, delay))
+        if (outBounds || collision || cloning) return
+        
+        setState(newState)
+      }, delay)
     }
   })
 }

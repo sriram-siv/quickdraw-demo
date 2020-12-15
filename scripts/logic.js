@@ -14,8 +14,9 @@ export const getBlock = () => (
 export const generateController = bindings => {
   const keys = {}
   return {
-    getKey: (key) => keys[key],
-    setKey: (key, timer) => keys[key] = timer,
+    get: (key) => keys[key],
+    set: (key, timer, delay) => keys[key] = startInterval(timer, delay),
+    clear: key => keys[key] = null,
     bindings
   }
 }
