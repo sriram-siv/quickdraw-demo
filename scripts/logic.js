@@ -104,30 +104,30 @@ export const placePiece = prevState => {
   }
 }
 
-export const move = (translation, [prev, current]) => {
-  const offset = findOffset(current.fallingPiece, translation, current)
+export const move = (translation, prevState) => {
+  const offset = findOffset(prevState.fallingPiece, translation, prevState)
   return offset === false
-    ? current
+    ? prevState
     : placePiece({
-      ...current,
-      fallingPosition: current.fallingPosition += translation
+      ...prevState,
+      fallingPosition: prevState.fallingPosition += translation
     })
 }
 
-export const rotate = (direction, [prev, current]) => {
+export const rotate = (direction, prevState) => {
   const rotatedPiece = {
-    block: rotateArray(current.fallingPiece.block, direction),
-    color: current.fallingPiece.color
+    block: rotateArray(prevState.fallingPiece.block, direction),
+    color: prevState.fallingPiece.color
   }
 
-  const offset = findOffset(rotatedPiece, 0, current)
+  const offset = findOffset(rotatedPiece, 0, prevState)
 
   return offset === false
-    ? current
+    ? prevState
     : placePiece({
-      ...current,
+      ...prevState,
       fallingPiece: rotatedPiece,
-      fallingPosition: current.fallingPosition + offset
+      fallingPosition: prevState.fallingPosition + offset
     })
 }
 
@@ -138,24 +138,25 @@ export const spawnBlock = prevState => ({
   nextPiece: getBlock()
 })
 
-export const hold = (_, [prev, current]) => {
+export const hold = (_, prevState) => {
 
-  const offset = findOffset(current.holdPiece || current.nextPiece, 0, current)
+  const offset = findOffset(prevState.holdPiece || prevState.nextPiece, 0, prevState)
 
-  if (offset === false) return current
+  if (offset === false) return prevState
 
   return placePiece({
-    ...current,
-    holdPiece: current.fallingPiece,
-    fallingPiece: current.holdPiece || current.nextPiece,
-    nextPiece: current.holdPiece ? current.nextPiece : getBlock(),
-    fallingPosition: current.fallingPosition + offset
+    ...prevState,
+    holdPiece: prevState.fallingPiece,
+    fallingPiece: prevState.holdPiece || prevState.nextPiece,
+    nextPiece: prevState.holdPiece ? prevState.nextPiece : getBlock(),
+    fallingPosition: prevState.fallingPosition + offset
   })
 }
 
 export const pause = (loopFunction, prevState) => {
   clearInterval(prevState.timer)
   const delay = Math.max(100, 1000 - (Math.floor(prevState.lines / 10) * 100))
+
 
   return {
     ...prevState,
@@ -172,4 +173,15 @@ export const updateScore = prevState => {
     lines: newLineTotal,
     score: newScore
   }
+}
+
+export const controllerMoveValid = (current, next) => {
+  // newStates cells must be rechecked due to asynchronous call
+  const placementMap = getPlacementMap(next.fallingPiece, next.fallingPosition)
+  const isOutOfBounds = placementMap.some(i => i >= 210)
+  const hasCollided = placementMap.some(i => current.cells[i]?.value === 2)
+  const hasCloned = current.cells.every(cell => cell?.value !== 1)
+    && next.cells.some(cell => cell.value === 1)
+  
+  return !isOutOfBounds && !hasCollided && !hasCloned
 }
