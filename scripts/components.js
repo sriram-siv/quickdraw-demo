@@ -1,6 +1,6 @@
 import { node, hasUpdated } from './draw.js'
-import { getLine, ghost, pause, gameLoop, getBlock } from './logic.js'
-import { styles, newCell } from './objects.js'
+import { getLine, ghost, pause, gameLoop } from './logic.js'
+import { styles } from './objects.js'
 
 export const board = (state, deps) => {
 
@@ -140,17 +140,7 @@ export const pauseMenu = (state, deps) => {
   const unpause = () => state.set(pause(() => gameLoop(state), state.now))
 
   const restart = () => {
-    state.set({
-      cells: Array.from({ length: 210 }, () => ({ ...newCell })),
-      fallingPosition: 4,
-      fallingPiece: getBlock(),
-      nextPiece: getBlock(),
-      holdPiece: null,
-      lines: 0,
-      score: 0,
-      newLines: [],
-      timer: 0
-    })
+    state.set(state.history[0])
     unpause()
   }
 

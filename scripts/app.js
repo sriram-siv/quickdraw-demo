@@ -25,7 +25,6 @@ import {
 
 const init = () => {
   // TODO
-  // Could have a debug setting that allows for variable length history
   // Improve kicks
   // Clear key timers on pause
 

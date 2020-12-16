@@ -34,7 +34,6 @@ export const node = ({ type, className, style, events } = {}, children) => {
   if (style) {
     Object.keys(style).forEach(property => element.style[property] = style[property])
   }
-  
   // Allow for single children
   if (children && !Array.isArray(children)) children = [children]
   // Attach Children
@@ -58,9 +57,11 @@ export const useState = (initial, app) => {
   const state = {
     last: {},
     now: initial,
+    history: [{ ...initial }],
     set: next => {
       state.last = { ...state.now }
       state.now = Object.assign(state.now, next)
+      state.history.push({ ...state.now })
       inject(state, app, root) // add true as last arg to get performance data in console
     }
   }
