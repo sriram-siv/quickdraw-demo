@@ -40,12 +40,11 @@ const init = () => {
       return
     }
 
-    setState(pause(gameLoop,
-      findCompleteLines(alterCells(1, 2, state[1]))))
+    setState(findCompleteLines(alterCells(1, 2, state[1])))
 
     setTimeout(() => {
       setState({
-        ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(state[1]))))),
+        ...pause(gameLoop, pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(state[1])))))),
         newLines: []
       })
     }, 200)
@@ -85,7 +84,6 @@ const init = () => {
     controller.clear(key, null)
   })
 
-  // TODO refactor and clean up
   window.addEventListener('keydown', ({ key }) => {
     // Only allow unpause in paused state
     if (key !== 'Escape' && !state[1].timer) return

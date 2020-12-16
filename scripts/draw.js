@@ -8,10 +8,12 @@ export const hasUpdated = ([prev, next], dependencies) => (
     const prevValue = stateValue(prev, key)
     const nextValue = stateValue(next, key)
     const prevKeys = Object.keys(prevValue)
-    const nextKeys = Object.keys(nextValue)
+    // const nextKeys = Object.keys(nextValue)
 
+    
     return typeof(nextValue) === 'object'
-      ? prevKeys.length !== nextKeys.length || hasUpdated([prevValue, nextValue], prevKeys)
+      // ? prevKeys.length !== nextKeys.length || hasUpdated([prevValue, nextValue], prevKeys)
+      ? prevValue.length !== nextValue.length || hasUpdated([prevValue, nextValue], prevKeys)
       : prevValue !== nextValue
   })
 )

@@ -7,9 +7,13 @@ export const rotateArray = (array, direction) => {
   return direction === 1 ? result : result.map(line => line.reverse()).reverse()
 }
 
-export const getBlock = () => (
-  tetrominoes[Math.floor(Math.random() * tetrominoes.length)]
-)
+// Could refactor this to just be an int and then call styles.blockColors when necessary
+export const getBlock = () => {
+  const random = Math.floor(Math.random() * tetrominoes.length)
+  return {
+    block: tetrominoes[random], color: styles.blockColors[random]
+  }
+}
 
 export const generateController = bindings => {
   const keys = {}
@@ -155,8 +159,10 @@ export const hold = (_, prevState) => {
 
 export const pause = (loopFunction, prevState) => {
   clearInterval(prevState.timer)
-  const delay = Math.max(100, 1000 - (Math.floor(prevState.lines / 10) * 100))
-
+  // Minimum 100ms between steps 
+  // -100ms for each level increase 
+  // -200ms to account for delay for flash animation
+  const delay = Math.max(100, 1000 - (Math.floor(prevState.lines / 10) * 100) - 200)
 
   return {
     ...prevState,

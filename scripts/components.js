@@ -132,6 +132,23 @@ export const info = (state, deps) => {
   })
 }
 
+export const pauseMenu = (state, deps) => {
+  if (!hasUpdated(state, deps)) {
+    const element = document.querySelector('.pause-menu')
+    if (element) return element
+  }
+
+  return state[1].timer === null
+    ? $Node({
+      className: 'pause-menu',
+      children:
+        [
+          'PAUSED'
+        ]
+    })
+    : ''
+}
+
 export const game = state => {
   if (!hasUpdated(state, Object.keys(state[1]))) {
     const element = document.querySelector('.game')
@@ -143,7 +160,8 @@ export const game = state => {
     children:
     [
       board(state, ['cells', 'newLines']),
-      info(state, ['lines', 'score', 'nextPiece', 'holdPiece'])
+      info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
+      pauseMenu(state, ['timer'])
     ]
   })
 }

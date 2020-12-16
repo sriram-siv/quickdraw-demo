@@ -6,16 +6,18 @@ body {
 
 .game {
   display: flex;
-  padding: 2.5vh 10px;
+  position: relative;
   width: fit-content;
+  height: 95vh;
+  padding: 2.5vh 10px;
   margin: auto;
 }
 
 .game-well {
   display: flex;
   flex-wrap: wrap;
-  width: 50vh;
-  height: 95vh;
+  width: 47.5vh;
+  margin-right: 10px;
 
   div {
     width: 4.75vh;
@@ -62,10 +64,18 @@ body {
   }
 }
 
-.pause {
+.pause-menu {
+  background-color: #aaaa;
   position: absolute;
-  left: 23.75vh;
-  transform: translate(-50%, 0);
+  left: calc(23.75vh + 10px);
+  top: calc(4.75vh + 2.5vh);
+  height: 47.5vh;
+  width: 38vh;
+  transform: translate(-50%, 0%);
+
+  text-align: center;
+  padding-top: 9.5vh;
+  font-size: 2rem;
 }
 
 @keyframes flash {
