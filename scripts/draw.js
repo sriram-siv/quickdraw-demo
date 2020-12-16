@@ -39,7 +39,7 @@ export const $Node = ({ type, className, style, children, events } = {}) => {
     else node.append(child)
   })
   // Attach Events
-  events?.forEach(([type, callBack]) => node.addEventListener(type, callBack))
+  events?.forEach(([type, callback]) => node.addEventListener(type, callback))
   return node
 }
 
