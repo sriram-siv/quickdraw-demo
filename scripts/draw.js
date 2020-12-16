@@ -28,19 +28,22 @@ export const inject = (state, app, root, profile) => {
 
 
 export const node = ({ type, className, style, children, events } = {}) => {
-  const node = document.createElement(type || 'div')
-  if (className) node.classList.add(className)
+  const element = document.createElement(type || 'div')
+  if (className) element.classList.add(className)
   if (style) {
-    Object.keys(style).forEach(property => node.style[property] = style[property])
+    Object.keys(style).forEach(property => element.style[property] = style[property])
   }
+  
+  // Allow for single children
+  if (children && !Array.isArray(children)) children = [children]
   // Attach Children
   children?.forEach(child => {
-    if (typeof(child) === 'string') node.innerHTML += child
-    else node.append(child)
+    if (typeof(child) === 'string') element.innerHTML += child
+    else element.append(child)
   })
   // Attach Events
-  events?.forEach(([type, callback]) => node.addEventListener(type, callback))
-  return node
+  events?.forEach(([type, callback]) => element.addEventListener(type, callback))
+  return element
 }
 
 /**

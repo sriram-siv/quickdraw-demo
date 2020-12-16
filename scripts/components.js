@@ -100,32 +100,28 @@ export const playerData = (state, deps) => {
         // With children as second argument
         // node(
         //   { className: 'level' },
-        //   [
-        //     node(
-        //       { type: 'p' },
-        //       ['Level:', node({ type: 'span', children: [level] })]
-        //     )
-        //   ]
+        //   [node(
+        //     { type: 'p' },
+        //     ['Level:', node({ type: 'span', children: [level] })]
+        //   )]
         // ),
         node({
           className: 'level',
           children:
-            [
-              node({
-                type: 'p',
-                children: ['Level:', node({ type: 'span', children: [level] })]
-              })
-            ]
+            node({
+              type: 'p',
+              children: ['Level: ', node({ type: 'span', children: [level] })]
+            })
         }),
         node({
           className: 'lines',
           children:
-            [node({ type: 'p', children: [`Lines: <span>${lines}</span>`] })]
+            node({ type: 'p', children: [`Lines: <span>${lines}</span>`] })
         }),
         node({
           className: 'score',
           children:
-            [node({ type: 'p', children: [`Score: <span>${score}</span>`] })]
+            node({ type: 'p', children: [`Score: <span>${score}</span>`] })
         })
       ]
   })
