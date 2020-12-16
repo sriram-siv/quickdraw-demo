@@ -1,12 +1,12 @@
 import { $Node, hasUpdated } from './draw.js'
-import { getLine, ghost, pause } from './logic.js'
-import { styles } from './objects.js'
+import { getLine, ghost, pause, gameLoop, getBlock } from './logic.js'
+import { styles, newCell } from './objects.js'
 
 export const board = (state, deps) => {
   const element = document.querySelector('.game-well')
   // Update
   if (!hasUpdated(state, deps)) {
-    if (element) return element
+    return element
   }
 
   const { cells: prevCells, newLines: prevNewLines } = state.last
@@ -59,7 +59,7 @@ export const board = (state, deps) => {
   return element
 }
 
-export const preview = (state, { className, piece }) => {
+export const preview = (state, _, { className, piece }) => {
   if (!hasUpdated(state, [piece])) { 
     const element = document.querySelector(piece)
     if (element) return element
@@ -84,17 +84,18 @@ export const preview = (state, { className, piece }) => {
   })
 }
 
-export const playerData = state => {
-  if (!hasUpdated(state, ['level', 'lines', 'score'])) {
-    const element = document.querySelector('.player-data')
-    if (element) return element
+export const playerData = (state, deps) => {
+  const className = 'player-data'
+  if (!hasUpdated(state, deps)) {
+    return document.querySelector(`.${className}`)
   }
 
   const { lines, score } = state.now
   const level = Math.floor(lines / 10)
 
   return $Node({
-    className: 'player-data', children:
+    className,
+    children:
       [
         $Node({
           className: 'level',
@@ -116,33 +117,48 @@ export const playerData = state => {
 }
 
 export const info = (state, deps) => {
+  const className = 'info'
   if (!hasUpdated(state, deps)) {
-    const element = document.querySelector('.info')
-    if (element) return element
+    return document.querySelector(`.${className}`)
   }
 
   return $Node({
-    className: 'info',
+    className,
     children:
     [
-      playerData(state),
-      preview(state, { className: 'next', piece: 'nextPiece' }),
-      preview(state, { className: 'hold', piece: 'holdPiece' })
+      playerData(state, ['lines', 'score']),
+      preview(state, [], { className: 'next', piece: 'nextPiece' }),
+      preview(state, [], { className: 'hold', piece: 'holdPiece' })
     ]
   })
 }
 
-export const pauseMenu = (state, deps, { gameLoop }) => {
+export const pauseMenu = (state, deps) => {
+  const className = 'pause-menu'
   if (!hasUpdated(state, deps)) {
-    const element = document.querySelector('.pause-menu')
-    if (element) return element
+    return document.querySelector(`.${className}`) || ''
   }
 
-  const unpause = () => state.set(pause(gameLoop, state.now))
+  const unpause = () => state.set(pause(() => gameLoop(state), state.now))
 
-  return state.now.timer === null
+  const restart = () => {
+    state.set({
+      cells: Array.from({ length: 210 }, () => ({ ...newCell })),
+      fallingPosition: 4,
+      fallingPiece: getBlock(),
+      nextPiece: getBlock(),
+      holdPiece: null,
+      lines: 0,
+      score: 0,
+      newLines: [],
+      timer: 0
+    })
+    unpause()
+  }
+
+  return !state.now.timer
     ? $Node({
-      className: 'pause-menu',
+      className,
       children:
         [
           $Node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
@@ -150,16 +166,20 @@ export const pauseMenu = (state, deps, { gameLoop }) => {
             type: 'button',
             children: ['resume'],
             events: [['click', unpause]]
+          }),
+          $Node({
+            type: 'button',
+            children: ['restart'],
+            events: [['click', restart]]
           })
         ]
     })
     : ''
 }
 
-export const game = (state, deps, { gameLoop }) => {
+export const game = state => {
   if (!hasUpdated(state, Object.keys(state.now))) {
-    const element = document.querySelector('.game')
-    if (element) return element
+    return document.querySelector('.game')
   }
 
   return $Node({
@@ -168,7 +188,7 @@ export const game = (state, deps, { gameLoop }) => {
     [
       board(state, ['cells', 'newLines']),
       info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
-      pauseMenu(state, ['timer'], { gameLoop })
+      pauseMenu(state, ['timer'])
     ]
   })
 }

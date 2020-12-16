@@ -1,6 +1,7 @@
 body {
   background-color: #333;
   margin: 0;
+  font-family: Helvetica, Arial, sans-serif;
 }
 
 .game {
@@ -64,20 +65,31 @@ body {
   position: absolute;
   left: calc(23.75vh + 10px);
   top: calc(4.75vh + 2.5vh);
-  height: 47.5vh;
+  height: 38vh;
   width: 38vh;
   transform: translate(-50%, 0%);
-  padding-top: 9.5vh;
+  border-radius: 3px;
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items: center;
 }
 .pause-menu .pause-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
+  margin: 8vh auto 5vh;
 }
 .pause-menu button {
   width: 50%;
+  margin: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  background-color: lightblue;
+  color: #333;
+  border: none;
+  border-radius: 3px;
+}
+.pause-menu button:hover {
+  background-color: dodgerblue;
 }
 
 @keyframes flash {

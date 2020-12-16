@@ -1,18 +1,12 @@
 import {
   getBlock,
   generateController,
-  findCompleteLines,
-  removeLines,
-  findOffset,
-  placePiece,
   ghost,
   alterCells,
   move,
   rotate,
   hold,
-  spawnBlock,
   pause,
-  updateScore,
   controllerMoveValid,
   gameLoop
 } from './logic.js'
@@ -34,7 +28,6 @@ const init = () => {
   // Could have a debug setting that allows for variable length history
   // Improve kicks
   // Clear key timers on pause
-  // Could change pause(pause()) to its own function -> refreshTimer
 
   const state = useState(
     {
@@ -46,11 +39,9 @@ const init = () => {
       lines: 0,
       score: 0,
       newLines: [],
-      timer: null
+      timer: 0
     },
-    [
-      { component: game, args: { gameLoop } }
-    ]
+    game
   )
 
   state.set(pause(() => gameLoop(state), state.now))
@@ -74,7 +65,7 @@ const init = () => {
 
   window.addEventListener('keydown', ({ key }) => {
     // Only allow unpause in paused state
-    if (key !== 'Escape' && state.now.timer === null) return
+    if (key !== 'Escape' && !state.now.timer) return
     
     if (!controller.get(key) && controller.bindings[key]) {
       const [value, delay, action] = controller.bindings[key]

@@ -20,12 +20,10 @@ export const stateValue = (state, keys) => {
   return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
 }
 
-export const draw = (state, app, root) => {
-  app.map(({ component, deps, args }, i) => {
-    const child = component(state, deps, args)
-    root.children[i].replaceWith(child)
-  })
-  // root.children[0].replaceWith(app(state))
+export const inject = (state, app, root, profile) => {
+  const t0 = performance.now()
+  root.children[0].replaceWith(app(state))
+  if (profile) console.log(performance.now() - t0)
 }
 
 export const $Node = ({ type, className, style, children, events } = {}) => {
@@ -44,6 +42,12 @@ export const $Node = ({ type, className, style, children, events } = {}) => {
   return node
 }
 
+/**
+ * Injects app into DOM and calls first draw
+ * Returns a state object : { last, now, set }
+ * @param {{}} initial state
+ * @param {Function} app
+ */
 export const useState = (initial, app) => {
   const root = document.querySelector('body')
   const state = {
@@ -52,14 +56,11 @@ export const useState = (initial, app) => {
     set: next => {
       state.last = { ...state.now }
       state.now = Object.assign(state.now, next)
-
-      // const t0 = performance.now()
-      draw(state, app, root)
-      // console.log(performance.now() - t0)
+      inject(state, app, root) // add true as last arg to get performance data in console
     }
   }
   // Initial draw
-  draw(state, app, root)
+  inject(state, app, root)
 
   return state
 }
