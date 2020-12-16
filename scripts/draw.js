@@ -44,7 +44,7 @@ export const $Node = ({ type, className, style, children } = {}) => {
 }
 
 export const useState = (initial, children) => {
-  const root = document.querySelector('.game')
+  const root = document.querySelector('body')
   const state = [
     {},
     initial

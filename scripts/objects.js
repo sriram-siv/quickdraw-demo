@@ -57,3 +57,5 @@ export const styles = {
   background: 'white',
   ghost: 'lightgray'
 }
+
+export const newCell = { value: 0, color: styles.background }

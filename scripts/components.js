@@ -1,5 +1,5 @@
 import { $Node, hasUpdated } from './draw.js'
-import { ghost } from './logic.js'
+import { getLine, ghost } from './logic.js'
 import { styles } from './objects.js'
 
 export const board = (state, deps) => {
@@ -9,8 +9,8 @@ export const board = (state, deps) => {
     if (element) return element
   }
 
-  const { cells: prevCells } = state[0]
-  const { cells, fallingPiece, newLines } = state[1]
+  const { cells: prevCells, newLines: prevNewLines } = state[0]
+  const { cells, newLines } = state[1]
 
   // Initialize
   if (!prevCells) {
@@ -22,40 +22,39 @@ export const board = (state, deps) => {
     })
   }
 
-  // Probably better to store the colors
-
-  
-
   // Flash lines
-  Array.from(element.children).forEach((cell, i) => {
-    const lineNumber = Math.floor(i / 10) + 1
-    const isComplete = newLines.includes(lineNumber)
-    cell.style.animation = isComplete ? 'flash 0.2s' : ''
+  newLines.forEach(lineNumber => {
+    const line = getLine(lineNumber - 1, Array.from(element.children))
+    line.forEach(cell => cell.style.animation = 'flash 0.2s')
+  })
+  prevNewLines.forEach(lineNumber => {
+    const line = getLine(lineNumber - 1, Array.from(element.children))
+    line.forEach(cell => cell.style.animation = '')
   })
 
   const cellsToUpdate = cells.reduce((acc, cell, i) => {
-    return prevCells[i] !== cell || cell === 1 ? acc.concat(i) : acc
+    const update = element.children[i - 10]?.style.backgroundColor !== cell.color
+    return update || cell.value === 1 ? acc.concat(i) : acc
   }, [])
 
-  // Remove previous ghost
-  cells.slice(10).reduce((acc, cell, i) => (
-    element.children[i].style.backgroundColor === styles.ghost ? acc.concat(i) : acc
-  ), []).forEach(i => element.children[i].style.backgroundColor = styles.background)
+  // Update cells
+  cellsToUpdate
+    .filter(i => i >= 10)
+    .forEach(i => {
+      element.children[i - 10].style.backgroundColor = cells[i].color
+    })
 
-  cellsToUpdate.forEach(i => {
-    if (cells[i]) {
-      // Add new ghost
-      const position = i - 10 + ghost(state[1])
-      if (position < 200) {
-        element.children[position].style.backgroundColor = styles.ghost
-      } else console.log('missing element at: ', position)
-    }
-
-    if (i >= 10) {
-      element.children[i - 10].style.backgroundColor = cells[i]
-        ? fallingPiece.color : styles.background
-    }
-  })
+  // Add new ghost
+  cellsToUpdate
+    .filter(i => cells[i].value === 1)
+    .map(i => i + ghost(state[1]))
+    .filter(i => cells[i].value !== 1)
+    .forEach(i => {
+      if (i - 10 < 200) {
+        element.children[i - 10].style.backgroundColor = styles.ghost
+      } else console.log('youve gone too far!')
+      // This is because the ghost is one too low on clearing
+    })
 
   return element
 }
@@ -131,9 +130,20 @@ export const info = (state, deps) => {
       preview(state, { className: 'hold', piece: 'holdPiece' })
     ]
   })
-  // return draw(state, [
-  //   { component: playerData },
-  //   { component: preview, args: { className: 'next', piece: 'nextPiece' } },
-  //   { component: preview, args: { className: 'hold', piece: 'holdPiece' } }
-  // ], $Node({ className: 'info' }))
+}
+
+export const game = state => {
+  if (!hasUpdated(state, Object.keys(state[1]))) {
+    const element = document.querySelector('.game')
+    if (element) return element
+  }
+
+  return $Node({
+    className: 'game',
+    children:
+    [
+      board(state, ['cells', 'newLines']),
+      info(state, ['lines', 'score', 'nextPiece', 'holdPiece'])
+    ]
+  })
 }

@@ -18,6 +18,7 @@ import {
 
 import {
   board,
+  game,
   info
 } from './components.js'
 
@@ -25,47 +26,36 @@ import {
   useState
 } from './draw.js'
 
+import {
+  newCell
+} from './objects.js'
+
 const init = () => {
   // TODO
   // Could have a debug setting that allows for variable length history
-  // Remove lines doesnt remember colors properly
   // Improve kicks
+  // ghost is top layer
 
   const gameLoop = () => {
     if (findOffset(state[1].fallingPiece, 10, state[1]) === 0) {
       setState((move(10, state)))
       return
     }
-    // Else
-    // Working version
-    // setState(pause(gameLoop, findCompleteLines(alterCells(1, 2, state[1]))))
-    // flashLines(state)((nextState, speedUp) => {
-    //   // Delayed function call returned from flashLines
-    //   setState({
-    //     ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(nextState)))), speedUp)
-    //   })
-    // })
 
-
-    
     setState(pause(gameLoop,
-      placePiece(spawnBlock(findCompleteLines(alterCells(1, 2, state[1]))))))
-      
-    // TODO Could be an issue here with allowing manual unpause inbetween flash states
+      findCompleteLines(alterCells(1, 2, state[1]))))
 
     setTimeout(() => {
       setState({
-        ...pause(gameLoop, removeLines(updateScore(state[1]))),
+        ...pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(state[1]))))),
         newLines: []
       })
     }, 200)
-
-    // if it works, can remove speedUp param from pause
   }
 
   const [state, setState] = useState(
     {
-      cells: Array.from({ length: 210 }, () => 0),
+      cells: Array.from({ length: 210 }, () => ({ ...newCell })),
       fallingPosition: 4,
       fallingPiece: getBlock(),
       nextPiece: getBlock(),
@@ -76,8 +66,7 @@ const init = () => {
       timer: setInterval(gameLoop, 1000)
     },
     [
-      { component: board, deps: ['cells', 'newLines'] },
-      { component: info, deps: [ 'lines', 'score', 'nextPiece', 'holdPiece'] }
+      { component: game }
     ]
   )
 
@@ -86,9 +75,9 @@ const init = () => {
     // newStates cells must be rechecked due to asynchronous call
     const placement = getPlacementMap(next.fallingPiece, next.fallingPosition)
     const outBounds = placement.some(i => i >= 210)
-    const collision = placement.some(i => current.cells[i] === 2)
-    const cloning = current.cells.every(cell => cell !== 1)
-      && next.cells.some(cell => cell === 1)
+    const collision = placement.some(i => current.cells[i]?.value === 2)
+    const cloning = current.cells.every(cell => cell?.value !== 1)
+      && next.cells.some(cell => cell.value === 1)
     
     return !outBounds && !collision && !cloning
   }

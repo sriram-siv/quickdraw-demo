@@ -1,4 +1,4 @@
-import { tetrominoes, offsets } from './objects.js'
+import { tetrominoes, offsets, newCell, styles } from './objects.js'
 
 export const rotateArray = (array, direction) => {
   const result = Array.from({ length: array.length }, (_, i) => (
@@ -37,7 +37,7 @@ export const getLine = (line, cells) => (
 export const findCompleteLines = prevState => ({
   ...prevState,
   newLines: Array.from({ length: 21 }).reduce((acc, val, i) => (
-    getLine(i, prevState.cells).every(cell => cell === 2) ? acc.concat(i) : acc
+    getLine(i, prevState.cells).every(cell => cell.value === 2) ? acc.concat(i) : acc
   ), [])
 })
 
@@ -48,25 +48,25 @@ export const removeLines = (prevState, lineCount = 0) => {
     ? removeLines({
       ...prevState,
       cells: cells.map((cell, i) => (
-        lineNumber(i) > newLines[lineCount] ? cell : cells[i - 10] || 0
+        lineNumber(i) > newLines[lineCount] ? cell : cells[i - 10] || { ...newCell }
       ))
     }, ++lineCount)
     : prevState
 }
 
-export const findOffset = (piece, translation, prevState, check = 0, debug = false) => {
+export const findOffset = (piece, translation, prevState, check = 0) => {
   if (check >= offsets.length) return false
   const spawnMap = getPlacementMap(piece, prevState.fallingPosition + translation + offsets[check])
   const prevSpawn = getPlacementMap(prevState.fallingPiece, prevState.fallingPosition)
 
-  const isFree = spawnMap.every(i => prevState.cells[i] < 2)
+  const isFree = spawnMap.every(i => prevState.cells[i]?.value < 2)
   
   const inBounds = Math.abs(translation) === 1
     ? spawnMap.every((val, i) => (val % 10) - (prevSpawn[i] % 10) === translation)
     : spawnMap.every(i => i % 10 !== 0) || spawnMap.every(i => i % 10 !== 9)
 
   return isFree && inBounds
-    ? offsets[check] : findOffset(piece, translation, prevState, ++check, debug)
+    ? offsets[check] : findOffset(piece, translation, prevState, ++check)
 }
 
 export const getPlacementMap = (piece, position) => (
@@ -81,26 +81,12 @@ export const ghost = (state, dropDistance = 0) => (
     : dropDistance
 )
 
-// TODO Can be removed
-export const flashLines = state => {
-  const displayCells = Array.from(document.querySelector('.game-well').children)
-  
-  state[1].newLines.forEach(line => {
-    const cells = getLine(--line, displayCells)
-    cells.forEach(cell => cell.style.animation = 'flash 0.2s forwards')
-  })
-
-  // const speedUp = state[1].newLines.length ? 300 : 0
-
-  // return delayedFunction => setTimeout(() => {
-  //   delayedFunction(state[1], speedUp)
-  //   displayCells.forEach(cell => cell.style.animation = '')
-  // }, 300)
-}
-
 export const alterCells = (prevValue, newValue, prevState) => ({
   ...prevState,
-  cells: prevState.cells.map(cell => cell === prevValue ? newValue : cell)
+  cells: prevState.cells.map(cell => cell.value === prevValue
+    ? { value: newValue, color: newValue === 0 ? styles.background : cell.color }
+    : cell
+  )
 })
 
 // Returns the state with the falling piece removed and replaced at the falling position
@@ -108,7 +94,9 @@ export const placePiece = prevState => {
   const { fallingPiece, fallingPosition } = prevState
   const spawnMap = getPlacementMap(fallingPiece, fallingPosition)
   
-  const cells = alterCells(1, 0, prevState).cells.map((cell, i) => spawnMap.includes(i) ? 1 : cell)
+  const cells = alterCells(1, 0, prevState).cells.map((cell, i) => (
+    spawnMap.includes(i) ? { value: 1, color: fallingPiece.color } : cell
+  ))
   
   return {
     ...prevState,
@@ -165,9 +153,9 @@ export const hold = (_, [prev, current]) => {
   })
 }
 
-export const pause = (loopFunction, prevState, speedUp = 0) => {
+export const pause = (loopFunction, prevState) => {
   clearInterval(prevState.timer)
-  const delay = Math.max(0, 1000 - (Math.floor(prevState.lines / 10) * 100) - speedUp)
+  const delay = Math.max(100, 1000 - (Math.floor(prevState.lines / 10) * 100))
 
   return {
     ...prevState,
