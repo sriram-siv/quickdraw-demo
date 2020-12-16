@@ -168,7 +168,7 @@ export const pause = (loopFunction, prevState) => {
 
   return {
     ...prevState,
-    timer: prevState.timer ? null : setInterval(() => loopFunction(prevState), delay)
+    timer: prevState.timer ? null : setInterval(loopFunction, delay)
   }
 }
 
@@ -195,22 +195,19 @@ export const controllerMoveValid = (current, next) => {
 }
 
 export const gameLoop = state => {
-  try {
-    if (findOffset(state.now.fallingPiece, 10, state.now) === 0) {
-      state.set((move(10, state.now)))
-
-      return
-    }
-  } catch (err) {
-    console.trace()
+  
+  if (findOffset(state.now.fallingPiece, 10, state.now) === 0) {
+    state.set((move(10, state.now)))
+    return
   }
 
+  const self = () => gameLoop(state)
+  
   state.set(findCompleteLines(alterCells(1, 2, state.now)))
 
   setTimeout(() => {
-    // state.set(pause)
     state.set({
-      ...pause(gameLoop, pause(gameLoop, 
+      ...pause(self, pause(self,
         placePiece(spawnBlock(removeLines(updateScore(state.now)))))),
       newLines: []
     })

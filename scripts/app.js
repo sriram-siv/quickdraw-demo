@@ -13,8 +13,8 @@ import {
   spawnBlock,
   pause,
   updateScore,
-  controllerMoveValid
-  // gameLoop
+  controllerMoveValid,
+  gameLoop
 } from './logic.js'
 
 import {
@@ -36,23 +36,6 @@ const init = () => {
   // Clear key timers on pause
   // Could change pause(pause()) to its own function -> refreshTimer
 
-  const gameLoop = () => {
-    if (findOffset(state.now.fallingPiece, 10, state.now) === 0) {
-      state.set((move(10, state.now)))
-      return
-    }
-
-    state.set(findCompleteLines(alterCells(1, 2, state.now)))
-
-    setTimeout(() => {
-      state.set({
-        ...pause(gameLoop, pause(gameLoop,
-          placePiece(spawnBlock(removeLines(updateScore(state.now)))))),
-        newLines: []
-      })
-    }, 200)
-  }
-
   const state = useState(
     {
       cells: Array.from({ length: 210 }, () => ({ ...newCell })),
@@ -70,9 +53,7 @@ const init = () => {
     ]
   )
 
-  state.set(pause(gameLoop, state.now))
-
-  // console.log(pause(gameLoop, state.now))
+  state.set(pause(() => gameLoop(state), state.now))
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
@@ -83,7 +64,7 @@ const init = () => {
     z: [-1, 200, rotate],
     x: [1, 200, rotate],
     Shift: [null, 500, hold],
-    Escape: [gameLoop, 1000, pause]
+    Escape: [() => gameLoop(state), 1000, pause]
   })
 
   window.addEventListener('keyup', ({ key }) => {
