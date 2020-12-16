@@ -27,7 +27,8 @@ export const inject = (state, app, root, profile) => {
 }
 
 
-export const node = ({ type, className, style, children, events } = {}) => {
+export const node = ({ type, className, style, events } = {}, children) => {
+  // Could change this to allow for fragments
   const element = document.createElement(type || 'div')
   if (className) element.classList.add(className)
   if (style) {

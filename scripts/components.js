@@ -16,12 +16,12 @@ export const board = (state, deps) => {
 
   // Initialize
   if (!prevCells) {
-    return node({
-      className: 'game-well',
-      children: Array.from({ length: 200 }, () => (
+    return node(
+      { className: 'game-well' },
+      Array.from({ length: 200 }, () => (
         node({ style: { backgroundColor: styles.background } })
       ))
-    })
+    )
   }
 
   // Flash lines
@@ -67,21 +67,23 @@ export const preview = (state, _, { className, piece }) => {
 
   const next = state.now
  
-  return node({
-    className, children:
+  return node(
+    { className },
     [
-      node({ type: 'p', className: 'label', children: [className.toUpperCase()] }),
-      node({
-        style: {
-          paddingBottom: `${Math.max(1, (4 - next[piece]?.block.length) * 4.75 / 2)}vh`,
-          width: `${next[piece]?.block.length * 4.75}vh`
+      node({ type: 'p', className: 'label' }, className.toUpperCase()),
+      node(
+        {
+          style: {
+            paddingBottom: `${Math.max(1, (4 - next[piece]?.block.length) * 4.75 / 2)}vh`,
+            width: `${next[piece]?.block.length * 4.75}vh`
+          }
         },
-        children: next[piece]?.block.flat().map(cell => (
+        next[piece]?.block.flat().map(cell => (
           node({ style: { backgroundColor: cell ? next[piece].color : styles.background } })
         ))
-      })
+      )
     ]
-  })
+  )
 }
 
 export const playerData = (state, deps) => {
@@ -93,38 +95,24 @@ export const playerData = (state, deps) => {
   const { lines, score } = state.now
   const level = Math.floor(lines / 10)
 
-  return node({
-    className,
-    children:
-      [
-        // With children as second argument
-        // node(
-        //   { className: 'level' },
-        //   [node(
-        //     { type: 'p' },
-        //     ['Level:', node({ type: 'span', children: [level] })]
-        //   )]
-        // ),
-        node({
-          className: 'level',
-          children:
-            node({
-              type: 'p',
-              children: ['Level: ', node({ type: 'span', children: [level] })]
-            })
-        }),
-        node({
-          className: 'lines',
-          children:
-            node({ type: 'p', children: [`Lines: <span>${lines}</span>`] })
-        }),
-        node({
-          className: 'score',
-          children:
-            node({ type: 'p', children: [`Score: <span>${score}</span>`] })
-        })
-      ]
-  })
+  const children = [
+    ['Lines', lines.toString()],
+    ['Level', level.toString()],
+    ['Score', score.toString()]
+  ]
+
+  return node(
+    { className },
+    children.map(([name, value]) => (
+      node(
+        { className: name.toLowerCase() },
+        node(
+          { type: 'p' },
+          [`${name}: `, node({ type: 'span' }, value)]
+        )
+      )
+    ))
+  )
 }
 
 export const info = (state, deps) => {
@@ -133,15 +121,14 @@ export const info = (state, deps) => {
     return document.querySelector(`.${className}`)
   }
 
-  return node({
-    className,
-    children:
+  return node(
+    { className },
     [
       playerData(state, ['lines', 'score']),
       preview(state, [], { className: 'next', piece: 'nextPiece' }),
       preview(state, [], { className: 'hold', piece: 'holdPiece' })
     ]
-  })
+  )
 }
 
 export const pauseMenu = (state, deps) => {
@@ -168,23 +155,24 @@ export const pauseMenu = (state, deps) => {
   }
 
   return !state.now.timer
-    ? node({
-      className,
-      children:
-        [
-          node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
-          node({
-            type: 'button',
-            children: ['resume'],
-            events: [['click', unpause]]
-          }),
-          node({
-            type: 'button',
-            children: ['restart'],
-            events: [['click', restart]]
-          })
-        ]
-    })
+    ? node(
+      { className },
+      [
+        node({ type: 'p', className: 'pause-title' }, ['PAUSED']),
+        node({
+          type: 'button',
+          events: [['click', unpause]]
+        },
+        ['resume'],
+        ),
+        node({
+          type: 'button',
+          events: [['click', restart]]
+        },
+        ['restart'],
+        )
+      ]
+    )
     : ''
 }
 
@@ -193,13 +181,12 @@ export const game = state => {
     return document.querySelector('.game')
   }
 
-  return node({
-    className: 'game',
-    children:
+  return node(
+    { className: 'game' },
     [
       board(state, ['cells', 'newLines']),
       info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
       pauseMenu(state, ['timer'])
     ]
-  })
+  )
 }
