@@ -49,10 +49,11 @@ const init = () => {
     // })
 
 
+    
     setState(pause(gameLoop,
       placePiece(spawnBlock(findCompleteLines(alterCells(1, 2, state[1]))))))
-
-    flashLines(state)
+      
+    // TODO Could be an issue here with allowing manual unpause inbetween flash states
 
     setTimeout(() => {
       setState({
@@ -118,6 +119,8 @@ const init = () => {
       const [value, delay, action] = controller.bindings[key]
       controller.set(key, () => {
         const newState = action(value, state)
+        // pause doesnt return a value at the moment
+        if (!newState) return
         if (controllerMoveValid(state[1], newState)) {
           setState(newState)
         }
