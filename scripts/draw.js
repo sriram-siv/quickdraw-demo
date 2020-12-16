@@ -26,7 +26,8 @@ export const inject = (state, app, root, profile) => {
   if (profile) console.log(performance.now() - t0)
 }
 
-export const $Node = ({ type, className, style, children, events } = {}) => {
+
+export const node = ({ type, className, style, children, events } = {}) => {
   const node = document.createElement(type || 'div')
   if (className) node.classList.add(className)
   if (style) {

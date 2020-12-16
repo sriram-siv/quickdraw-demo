@@ -69,6 +69,7 @@ const init = () => {
     
     if (!controller.get(key) && controller.bindings[key]) {
       const [value, delay, action] = controller.bindings[key]
+
       controller.set(key, () => {
         const newState = action(value, state.now)
         if (controllerMoveValid(state.now, newState)) {

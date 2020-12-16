@@ -1,10 +1,12 @@
-import { $Node, hasUpdated } from './draw.js'
+import { node, hasUpdated } from './draw.js'
 import { getLine, ghost, pause, gameLoop, getBlock } from './logic.js'
 import { styles, newCell } from './objects.js'
 
 export const board = (state, deps) => {
+
+  // TODO fit this in line with general pattern
+
   const element = document.querySelector('.game-well')
-  // Update
   if (!hasUpdated(state, deps)) {
     return element
   }
@@ -14,10 +16,10 @@ export const board = (state, deps) => {
 
   // Initialize
   if (!prevCells) {
-    return $Node({
+    return node({
       className: 'game-well',
       children: Array.from({ length: 200 }, () => (
-        $Node({ style: { backgroundColor: styles.background } })
+        node({ style: { backgroundColor: styles.background } })
       ))
     })
   }
@@ -48,13 +50,11 @@ export const board = (state, deps) => {
   cellsToUpdate
     .filter(i => cells[i].value === 1)
     .map(i => i + ghost(state.now))
+    // Dont draw over active cells
     .filter(i => cells[i].value !== 1)
-    .forEach(i => {
-      if (i - 10 < 200) {
-        element.children[i - 10].style.backgroundColor = styles.ghost
-      } else console.log('youve gone too far!')
-      // This is because the ghost is one too low on clearing
-    })
+    .forEach(i => (
+      element.children[i - 10].style.backgroundColor = styles.ghost
+    ))
 
   return element
 }
@@ -67,17 +67,17 @@ export const preview = (state, _, { className, piece }) => {
 
   const next = state.now
  
-  return $Node({
+  return node({
     className, children:
     [
-      $Node({ type: 'p', className: 'label', children: [className.toUpperCase()] }),
-      $Node({
+      node({ type: 'p', className: 'label', children: [className.toUpperCase()] }),
+      node({
         style: {
           paddingBottom: `${Math.max(1, (4 - next[piece]?.block.length) * 4.75 / 2)}vh`,
           width: `${next[piece]?.block.length * 4.75}vh`
         },
         children: next[piece]?.block.flat().map(cell => (
-          $Node({ style: { backgroundColor: cell ? next[piece].color : styles.background } })
+          node({ style: { backgroundColor: cell ? next[piece].color : styles.background } })
         ))
       })
     ]
@@ -93,24 +93,39 @@ export const playerData = (state, deps) => {
   const { lines, score } = state.now
   const level = Math.floor(lines / 10)
 
-  return $Node({
+  return node({
     className,
     children:
       [
-        $Node({
+        // With children as second argument
+        // node(
+        //   { className: 'level' },
+        //   [
+        //     node(
+        //       { type: 'p' },
+        //       ['Level:', node({ type: 'span', children: [level] })]
+        //     )
+        //   ]
+        // ),
+        node({
           className: 'level',
           children:
-            [$Node({ type: 'p', children: [`Level: <span>${level}</span>`] })]
+            [
+              node({
+                type: 'p',
+                children: ['Level:', node({ type: 'span', children: [level] })]
+              })
+            ]
         }),
-        $Node({
+        node({
           className: 'lines',
           children:
-            [$Node({ type: 'p', children: [`Lines: <span>${lines}</span>`] })]
+            [node({ type: 'p', children: [`Lines: <span>${lines}</span>`] })]
         }),
-        $Node({
+        node({
           className: 'score',
           children:
-            [$Node({ type: 'p', children: [`Score: <span>${score}</span>`] })]
+            [node({ type: 'p', children: [`Score: <span>${score}</span>`] })]
         })
       ]
   })
@@ -122,7 +137,7 @@ export const info = (state, deps) => {
     return document.querySelector(`.${className}`)
   }
 
-  return $Node({
+  return node({
     className,
     children:
     [
@@ -157,17 +172,17 @@ export const pauseMenu = (state, deps) => {
   }
 
   return !state.now.timer
-    ? $Node({
+    ? node({
       className,
       children:
         [
-          $Node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
-          $Node({
+          node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
+          node({
             type: 'button',
             children: ['resume'],
             events: [['click', unpause]]
           }),
-          $Node({
+          node({
             type: 'button',
             children: ['restart'],
             events: [['click', restart]]
@@ -182,7 +197,7 @@ export const game = state => {
     return document.querySelector('.game')
   }
 
-  return $Node({
+  return node({
     className: 'game',
     children:
     [
