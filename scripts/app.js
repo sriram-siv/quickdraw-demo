@@ -68,9 +68,6 @@ const init = () => {
     ]
   )
 
-
-  
-
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
     ArrowRight: [1, 100, move],
