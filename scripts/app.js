@@ -1,7 +1,6 @@
 import {
   getBlock,
   generateController,
-  startInterval,
   findCompleteLines,
   removeLines,
   findOffset,
@@ -11,7 +10,6 @@ import {
   move,
   rotate,
   hold,
-  flashLines,
   spawnBlock,
   pause,
   updateScore,
@@ -83,6 +81,7 @@ const init = () => {
     ]
   )
 
+  // TODO move to logic once happy with the code
   const controllerMoveValid = (current, next) => {
     // newStates cells must be rechecked due to asynchronous call
     const placement = getPlacementMap(next.fallingPiece, next.fallingPosition)
@@ -111,6 +110,7 @@ const init = () => {
     controller.clear(key, null)
   })
 
+  // TODO refactor and clean up
   window.addEventListener('keydown', ({ key }) => {
     // Only allow unpause in paused state
     if (key !== 'Escape' && !state[1].timer) return

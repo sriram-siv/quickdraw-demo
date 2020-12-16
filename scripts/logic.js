@@ -81,6 +81,7 @@ export const ghost = (state, dropDistance = 0) => (
     : dropDistance
 )
 
+// TODO Can be removed
 export const flashLines = state => {
   const displayCells = Array.from(document.querySelector('.game-well').children)
   
