@@ -143,7 +143,8 @@ export const pauseMenu = (state, deps) => {
       className: 'pause-menu',
       children:
         [
-          'PAUSED'
+          $Node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
+          $Node({ type: 'button', children: ['resume'], events: [['click', () => console.log('clicked :)')]] })
         ]
     })
     : ''

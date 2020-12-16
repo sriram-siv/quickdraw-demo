@@ -32,11 +32,12 @@ const init = () => {
   // TODO
   // Could have a debug setting that allows for variable length history
   // Improve kicks
+  // Clear key timers on pause
+  // Could change pause(pause()) to its own function -> refreshTimer
 
   const gameLoop = () => {
     if (findOffset(state[1].fallingPiece, 10, state[1]) === 0) {
       setState((move(10, state[1])))
-      
       return
     }
 
@@ -44,7 +45,8 @@ const init = () => {
 
     setTimeout(() => {
       setState({
-        ...pause(gameLoop, pause(gameLoop, placePiece(spawnBlock(removeLines(updateScore(state[1])))))),
+        ...pause(gameLoop, pause(gameLoop,
+          placePiece(spawnBlock(removeLines(updateScore(state[1])))))),
         newLines: []
       })
     }, 200)

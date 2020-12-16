@@ -8,11 +8,8 @@ export const hasUpdated = ([prev, next], dependencies) => (
     const prevValue = stateValue(prev, key)
     const nextValue = stateValue(next, key)
     const prevKeys = Object.keys(prevValue)
-    // const nextKeys = Object.keys(nextValue)
-
     
     return typeof(nextValue) === 'object'
-      // ? prevKeys.length !== nextKeys.length || hasUpdated([prevValue, nextValue], prevKeys)
       ? prevValue.length !== nextValue.length || hasUpdated([prevValue, nextValue], prevKeys)
       : prevValue !== nextValue
   })
@@ -30,18 +27,19 @@ export const draw = (state, components, root) => {
   })
 }
 
-export const $Node = ({ type, className, style, children } = {}) => {
+export const $Node = ({ type, className, style, children, events } = {}) => {
   const node = document.createElement(type || 'div')
   if (className) node.classList.add(className)
   if (style) {
     Object.keys(style).forEach(property => node.style[property] = style[property])
   }
-  if (children) {
-    children.forEach(child => {
-      if (typeof(child) === 'string') node.innerHTML += child
-      else node.append(child)
-    })
-  }
+  // Attach Children
+  children?.forEach(child => {
+    if (typeof(child) === 'string') node.innerHTML += child
+    else node.append(child)
+  })
+  // Attach Events
+  events?.forEach(([type, callBack]) => node.addEventListener(type, callBack))
   return node
 }
 

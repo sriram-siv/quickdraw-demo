@@ -72,10 +72,20 @@ body {
   height: 47.5vh;
   width: 38vh;
   transform: translate(-50%, 0%);
-
-  text-align: center;
   padding-top: 9.5vh;
-  font-size: 2rem;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  
+  .pause-title {
+    font-size: 2rem;  
+  }
+
+  button {
+    width: 50%;
+  }
 }
 
 @keyframes flash {
