@@ -3,14 +3,14 @@
  * @param {Array} state 
  * @param {Array} dependencies 
  */
-export const hasUpdated = ([prev, next], dependencies) => (
+export const hasUpdated = ({ last, now }, dependencies) => (
   dependencies.some(key => {
-    const prevValue = stateValue(prev, key)
-    const nextValue = stateValue(next, key)
-    const prevKeys = Object.keys(prevValue)
+    const prevValue = stateValue(last, key)
+    const nextValue = stateValue(now, key)
+    const nextKeys = Object.keys(nextValue)
     
     return typeof(nextValue) === 'object'
-      ? prevValue.length !== nextValue.length || hasUpdated([prevValue, nextValue], prevKeys)
+      ? prevValue.length !== nextValue.length || hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
       : prevValue !== nextValue
   })
 )
@@ -20,11 +20,12 @@ export const stateValue = (state, keys) => {
   return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
 }
 
-export const draw = (state, components, root) => {
-  components.map(({ component, deps, args }, i) => {
+export const draw = (state, app, root) => {
+  app.map(({ component, deps, args }, i) => {
     const child = component(state, deps, args)
     root.children[i].replaceWith(child)
   })
+  // root.children[0].replaceWith(app(state))
 }
 
 export const $Node = ({ type, className, style, children, events } = {}) => {
@@ -43,23 +44,22 @@ export const $Node = ({ type, className, style, children, events } = {}) => {
   return node
 }
 
-export const useState = (initial, children) => {
+export const useState = (initial, app) => {
   const root = document.querySelector('body')
-  const state = [
-    {},
-    initial
-  ]
-  draw(state, children, root)
-  return [
-    state,
-    next => {
-
-      state[0] = { ...state[1] }
-      state[1] = Object.assign(state[1], next)
+  const state = {
+    last: {},
+    now: initial,
+    set: next => {
+      state.last = { ...state.now }
+      state.now = Object.assign(state.now, next)
 
       // const t0 = performance.now()
-      draw(state, children, root)
+      draw(state, app, root)
       // console.log(performance.now() - t0)
     }
-  ]
+  }
+  // Initial draw
+  draw(state, app, root)
+
+  return state
 }

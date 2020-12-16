@@ -14,6 +14,7 @@ import {
   pause,
   updateScore,
   controllerMoveValid
+  // gameLoop
 } from './logic.js'
 
 import {
@@ -36,23 +37,23 @@ const init = () => {
   // Could change pause(pause()) to its own function -> refreshTimer
 
   const gameLoop = () => {
-    if (findOffset(state[1].fallingPiece, 10, state[1]) === 0) {
-      setState((move(10, state[1])))
+    if (findOffset(state.now.fallingPiece, 10, state.now) === 0) {
+      state.set((move(10, state.now)))
       return
     }
 
-    setState(findCompleteLines(alterCells(1, 2, state[1])))
+    state.set(findCompleteLines(alterCells(1, 2, state.now)))
 
     setTimeout(() => {
-      setState({
+      state.set({
         ...pause(gameLoop, pause(gameLoop,
-          placePiece(spawnBlock(removeLines(updateScore(state[1])))))),
+          placePiece(spawnBlock(removeLines(updateScore(state.now)))))),
         newLines: []
       })
     }, 200)
   }
 
-  const [state, setState] = useState(
+  const state = useState(
     {
       cells: Array.from({ length: 210 }, () => ({ ...newCell })),
       fallingPosition: 4,
@@ -62,19 +63,23 @@ const init = () => {
       lines: 0,
       score: 0,
       newLines: [],
-      timer: setInterval(gameLoop, 1000)
+      timer: null
     },
     [
-      { component: game }
+      { component: game, args: { gameLoop } }
     ]
   )
+
+  state.set(pause(gameLoop, state.now))
+
+  // console.log(pause(gameLoop, state.now))
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
     ArrowRight: [1, 100, move],
     ArrowDown: [10, 100, move],
     ArrowUp: [null, 1000,
-      () => alterCells(1, 2, move(ghost(state[1]), state[1]))],
+      (_, now) => alterCells(1, 2, move(ghost(now), now))],
     z: [-1, 200, rotate],
     x: [1, 200, rotate],
     Shift: [null, 500, hold],
@@ -88,14 +93,14 @@ const init = () => {
 
   window.addEventListener('keydown', ({ key }) => {
     // Only allow unpause in paused state
-    if (key !== 'Escape' && !state[1].timer) return
+    if (key !== 'Escape' && state.now.timer === null) return
     
     if (!controller.get(key) && controller.bindings[key]) {
       const [value, delay, action] = controller.bindings[key]
       controller.set(key, () => {
-        const newState = action(value, state[1])
-        if (controllerMoveValid(state[1], newState)) {
-          setState(newState)
+        const newState = action(value, state.now)
+        if (controllerMoveValid(state.now, newState)) {
+          state.set(newState)
         }
       }, delay)
     }

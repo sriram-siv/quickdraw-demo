@@ -98,8 +98,8 @@ export const styles = {
     'lightblue',
     'lightgreen',
     'lightpink',
-    'lightyellow',
-    'papayawhip',
+    'lightseagreen',
+    'lightsalmon',
     'palevioletred',
     'plum'
   ]

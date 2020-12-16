@@ -1,5 +1,5 @@
 import { $Node, hasUpdated } from './draw.js'
-import { getLine, ghost } from './logic.js'
+import { getLine, ghost, pause } from './logic.js'
 import { styles } from './objects.js'
 
 export const board = (state, deps) => {
@@ -9,8 +9,8 @@ export const board = (state, deps) => {
     if (element) return element
   }
 
-  const { cells: prevCells, newLines: prevNewLines } = state[0]
-  const { cells, newLines } = state[1]
+  const { cells: prevCells, newLines: prevNewLines } = state.last
+  const { cells, newLines } = state.now
 
   // Initialize
   if (!prevCells) {
@@ -47,7 +47,7 @@ export const board = (state, deps) => {
   // Add new ghost
   cellsToUpdate
     .filter(i => cells[i].value === 1)
-    .map(i => i + ghost(state[1]))
+    .map(i => i + ghost(state.now))
     .filter(i => cells[i].value !== 1)
     .forEach(i => {
       if (i - 10 < 200) {
@@ -65,7 +65,7 @@ export const preview = (state, { className, piece }) => {
     if (element) return element
   }
 
-  const next = state[1]
+  const next = state.now
  
   return $Node({
     className, children:
@@ -90,7 +90,7 @@ export const playerData = state => {
     if (element) return element
   }
 
-  const { lines, score } = state[1]
+  const { lines, score } = state.now
   const level = Math.floor(lines / 10)
 
   return $Node({
@@ -132,26 +132,32 @@ export const info = (state, deps) => {
   })
 }
 
-export const pauseMenu = (state, deps) => {
+export const pauseMenu = (state, deps, { gameLoop }) => {
   if (!hasUpdated(state, deps)) {
     const element = document.querySelector('.pause-menu')
     if (element) return element
   }
 
-  return state[1].timer === null
+  const unpause = () => state.set(pause(gameLoop, state.now))
+
+  return state.now.timer === null
     ? $Node({
       className: 'pause-menu',
       children:
         [
           $Node({ type: 'p', className: 'pause-title', children: ['PAUSED'] }),
-          $Node({ type: 'button', children: ['resume'], events: [['click', () => console.log('clicked :)')]] })
+          $Node({
+            type: 'button',
+            children: ['resume'],
+            events: [['click', unpause]]
+          })
         ]
     })
     : ''
 }
 
-export const game = state => {
-  if (!hasUpdated(state, Object.keys(state[1]))) {
+export const game = (state, deps, { gameLoop }) => {
+  if (!hasUpdated(state, Object.keys(state.now))) {
     const element = document.querySelector('.game')
     if (element) return element
   }
@@ -162,7 +168,7 @@ export const game = state => {
     [
       board(state, ['cells', 'newLines']),
       info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
-      pauseMenu(state, ['timer'])
+      pauseMenu(state, ['timer'], { gameLoop })
     ]
   })
 }

@@ -73,6 +73,7 @@ export const findOffset = (piece, translation, prevState, check = 0) => {
     ? offsets[check] : findOffset(piece, translation, prevState, ++check)
 }
 
+// Change name to map piece?
 export const getPlacementMap = (piece, position) => (
   piece.block.map((line, i) => (
     line.map((cell, j) => cell ? position + (i * 10) + j : -1)
@@ -158,6 +159,7 @@ export const hold = (_, prevState) => {
 }
 
 export const pause = (loopFunction, prevState) => {
+
   clearInterval(prevState.timer)
   // Minimum 100ms between steps 
   // -100ms for each level increase 
@@ -166,7 +168,7 @@ export const pause = (loopFunction, prevState) => {
 
   return {
     ...prevState,
-    timer: prevState.timer ? null : setInterval(loopFunction, delay)
+    timer: prevState.timer ? null : setInterval(() => loopFunction(prevState), delay)
   }
 }
 
@@ -190,4 +192,27 @@ export const controllerMoveValid = (current, next) => {
     && next.cells.some(cell => cell.value === 1)
   
   return !isOutOfBounds && !hasCollided && !hasCloned
+}
+
+export const gameLoop = state => {
+  try {
+    if (findOffset(state.now.fallingPiece, 10, state.now) === 0) {
+      state.set((move(10, state.now)))
+
+      return
+    }
+  } catch (err) {
+    console.trace()
+  }
+
+  state.set(findCompleteLines(alterCells(1, 2, state.now)))
+
+  setTimeout(() => {
+    // state.set(pause)
+    state.set({
+      ...pause(gameLoop, pause(gameLoop, 
+        placePiece(spawnBlock(removeLines(updateScore(state.now)))))),
+      newLines: []
+    })
+  }, 200)
 }
