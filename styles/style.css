@@ -4,6 +4,18 @@ body {
   font-family: Helvetica, Arial, sans-serif;
 }
 
+.bezel {
+  box-sizing: border-box;
+  border: 2px solid #0003;
+  border-bottom-color: #fff3;
+  border-right-color: #fff3;
+}
+
+.block {
+  width: 4.75vh;
+  height: 4.75vh;
+}
+
 .game {
   display: flex;
   position: relative;
@@ -18,10 +30,6 @@ body {
   flex-wrap: wrap;
   width: 47.5vh;
   margin-right: 10px;
-}
-.game-well div {
-  width: 4.75vh;
-  height: 4.75vh;
 }
 
 .info {
@@ -54,11 +62,6 @@ body {
   display: flex;
   flex-wrap: wrap;
 }
-.info .next div div,
-.info .hold div div {
-  width: 4.75vh;
-  height: 4.75vh;
-}
 
 .pause-menu {
   background-color: #aaaa;
@@ -85,8 +88,6 @@ body {
   font-size: 1rem;
   background-color: lightblue;
   color: #333;
-  border: none;
-  border-radius: 3px;
 }
 .pause-menu button:hover {
   background-color: dodgerblue;
@@ -95,6 +96,7 @@ body {
 @keyframes flash {
   100% {
     background-color: white;
+    border-color: white;
   }
 }
 

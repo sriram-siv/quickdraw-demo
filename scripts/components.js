@@ -4,6 +4,7 @@ import { styles } from './objects.js'
 
 export const board = (state, deps) => {
 
+
   // TODO fit this in line with general pattern
 
   const element = document.querySelector('.game-well')
@@ -19,7 +20,7 @@ export const board = (state, deps) => {
     return node(
       { className: 'game-well' },
       Array.from({ length: 200 }, () => (
-        node({ style: { backgroundColor: styles.background } })
+        node({ className: 'block', style: { backgroundColor: styles.background } })
       ))
     )
   }
@@ -34,7 +35,11 @@ export const board = (state, deps) => {
     line.forEach(cell => cell.style.animation = '')
   })
 
+  if (newLines.length) return element
+
   const cellsToUpdate = cells.reduce((acc, cell, i) => {
+    // TODO use hasUpdated ? (state, [cells.i]) // will need to test nested key functionality
+    // Doenst account for ghost though..
     const update = element.children[i - 10]?.style.backgroundColor !== cell.color
     return update || cell.value === 1 ? acc.concat(i) : acc
   }, [])
@@ -44,6 +49,8 @@ export const board = (state, deps) => {
     .filter(i => i >= 10)
     .forEach(i => {
       element.children[i - 10].style.backgroundColor = cells[i].color
+      if (cells[i].value > 0) element.children[i - 10].classList.add('bezel')
+      else element.children[i - 10].classList.remove('bezel')
     })
 
   // Add new ghost
@@ -79,7 +86,7 @@ export const preview = (state, _, { className, piece }) => {
           }
         },
         next[piece]?.block.flat().map(cell => (
-          node({ style: { backgroundColor: cell ? next[piece].color : styles.background } })
+          node({ className: 'block', style: { backgroundColor: cell ? next[piece].color : styles.background } })
         ))
       )
     ]
@@ -150,12 +157,14 @@ export const pauseMenu = (state, deps) => {
       [
         node({ type: 'p', className: 'pause-title' }, ['PAUSED']),
         node({
+          className: 'bezel',
           type: 'button',
           events: [['click', unpause]]
         },
         ['resume'],
         ),
         node({
+          className: 'bezel',
           type: 'button',
           events: [['click', restart]]
         },
@@ -164,19 +173,4 @@ export const pauseMenu = (state, deps) => {
       ]
     )
     : ''
-}
-
-export const game = state => {
-  if (!hasUpdated(state, Object.keys(state.now))) {
-    return document.querySelector('.game')
-  }
-
-  return node(
-    { className: 'game' },
-    [
-      board(state, ['cells', 'newLines']),
-      info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
-      pauseMenu(state, ['timer'])
-    ]
-  )
 }

@@ -1,3 +1,7 @@
+import { useState } from './draw.js'
+import { tetris } from '../components/tetris.js'
+import { newCell } from './objects.js'
+
 import {
   getBlock,
   generateController,
@@ -11,23 +15,20 @@ import {
   gameLoop
 } from './logic.js'
 
-import {
-  game
-} from './components.js'
-
-import {
-  useState
-} from './draw.js'
-
-import {
-  newCell
-} from './objects.js'
-
 const init = () => {
   // TODO
   // Improve kicks
   // Clear key timers on pause
+  // Controller intialises using a config file
+  // Pass state to controller?
+  // Why is state updating when moving against a wall? and no visible change
+  // Blocks can teleport when switching still
+  // When speed is fast - falling block only changes after unpause and at the same time as the block is switched
 
+  // Doesnt quite work as it can unpause from menu on debug
+  const pauseGame = () => state.set(pause(() => gameLoop(state), state.now))
+
+  // Define initial state (available to all children) and inject app into DOM
   const state = useState(
     {
       cells: Array.from({ length: 210 }, () => ({ ...newCell })),
@@ -40,10 +41,14 @@ const init = () => {
       newLines: [],
       timer: 0
     },
-    game
+    tetris,
+    { keys: ['Control', '/'], callback: pauseGame }
   )
 
-  state.set(pause(() => gameLoop(state), state.now))
+  // if this wasnt here, useState wouldnt need a return value
+  // controller uses it too
+  // Maybe move this to game component // or app component with initialise function
+  pauseGame()
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],

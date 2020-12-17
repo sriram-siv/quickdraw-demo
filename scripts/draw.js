@@ -1,23 +1,46 @@
-/**
- * Checks if any dependencies have been updated in the last state change
- * @param {Array} state 
- * @param {Array} dependencies 
- */
-export const hasUpdated = ({ last, now }, dependencies) => (
-  dependencies.some(key => {
-    const prevValue = stateValue(last, key)
-    const nextValue = stateValue(now, key)
-    const nextKeys = Object.keys(nextValue)
-    
-    return typeof(nextValue) === 'object'
-      ? prevValue.length !== nextValue.length || hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
-      : prevValue !== nextValue
-  })
-)
 
-// can take a nested key in the form < 'key.subKey' >
-export const stateValue = (state, keys) => {
-  return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
+
+
+
+
+
+/**
+ * Injects app into DOM and calls first draw
+ * Returns a state object : { last, now, set }
+ * @param {{}} initial state
+ * @param {Function} app
+ */
+export const useState = (initial, app, debug) => {
+  const root = document.querySelector('body')
+  const state = {
+    last: {},
+    now: initial,
+    history: [{ ...initial }],
+    set: (next, append = true) => {
+      state.last = { ...state.now }
+      state.now = Object.assign(state.now, next)
+      if (append) state.history.push({ ...state.now })
+      inject(state, app, root) // add true as last arg to get performance data in console
+    }
+  }
+  // Initial draw
+  inject(state, app, root)
+
+  if (debug) {
+    const activeKeys = {}
+    window.addEventListener('keydown', ({ key }) => {
+      if (!activeKeys[key]) {
+        activeKeys[key] = true
+        if (debug.keys.every(val => activeKeys[val])) {
+          debug.callback()
+          debugMode(state)
+        }
+      }
+    })
+    window.addEventListener('keyup', ({ key }) => activeKeys[key] = false)
+  }
+
+  return state
 }
 
 export const inject = (state, app, root, profile) => {
@@ -26,6 +49,19 @@ export const inject = (state, app, root, profile) => {
   if (profile) console.log(performance.now() - t0)
 }
 
+// TODO turn off
+// could call this initalise debug
+// and block keypresses through state.debug
+export const debugMode = state => {
+  const historyLength = state.history.length - 1
+  let step = historyLength
+  
+  window.addEventListener('keydown', ({ key }) => {
+    if (key === 'ArrowLeft') {
+      state.set(state.history[--step], false)
+    }
+  })
+} 
 
 export const node = ({ type, className, style, events } = {}, children) => {
   // Could change this to allow for fragments
@@ -47,26 +83,23 @@ export const node = ({ type, className, style, events } = {}, children) => {
 }
 
 /**
- * Injects app into DOM and calls first draw
- * Returns a state object : { last, now, set }
- * @param {{}} initial state
- * @param {Function} app
+ * Checks if any dependencies have been updated in the last state change
+ * @param {Array} state 
+ * @param {Array} dependencies 
  */
-export const useState = (initial, app) => {
-  const root = document.querySelector('body')
-  const state = {
-    last: {},
-    now: initial,
-    history: [{ ...initial }],
-    set: next => {
-      state.last = { ...state.now }
-      state.now = Object.assign(state.now, next)
-      state.history.push({ ...state.now })
-      inject(state, app, root) // add true as last arg to get performance data in console
-    }
-  }
-  // Initial draw
-  inject(state, app, root)
+export const hasUpdated = ({ last, now }, dependencies) => (
+  dependencies.some(key => {
+    const prevValue = stateValue(last, key)
+    const nextValue = stateValue(now, key)
+    const nextKeys = Object.keys(nextValue)
+    
+    return typeof(nextValue) === 'object'
+      ? prevValue.length !== nextValue.length || hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
+      : prevValue !== nextValue
+  })
+)
 
-  return state
+// can take a nested key in the form < 'key.subKey' >
+export const stateValue = (state, keys) => {
+  return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
 }

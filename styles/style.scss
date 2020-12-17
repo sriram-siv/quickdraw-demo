@@ -1,15 +1,29 @@
 
+$block-size: 4.75vh; 
+
 body {
   background-color: #333;
   margin: 0;
   font-family: Helvetica, Arial, sans-serif;
 }
 
+.bezel {
+  box-sizing: border-box;
+  border: 2px solid #0003;
+  border-bottom-color: #fff3;
+  border-right-color: #fff3;
+}
+
+.block {
+  width: $block-size;
+  height: $block-size;
+}
+
 .game {
   display: flex;
   position: relative;
   width: fit-content;
-  height: 95vh;
+  height: $block-size * 20;
   padding: 2.5vh 10px;
   margin: auto;
 }
@@ -17,13 +31,8 @@ body {
 .game-well {
   display: flex;
   flex-wrap: wrap;
-  width: 47.5vh;
+  width: $block-size * 10;
   margin-right: 10px;
-
-  div {
-    width: 4.75vh;
-    height: 4.75vh;
-  }
 }
 
 .info {
@@ -56,11 +65,6 @@ body {
     div {
       display: flex;
       flex-wrap: wrap;
-
-      div {
-        width: 4.75vh;
-        height: 4.75vh;
-      }
     }
   }
 }
@@ -93,8 +97,6 @@ body {
     font-size: 1rem;
     background-color: lightblue;
     color: #333;
-    border: none;
-    border-radius: 3px;
 
     &:hover {
       background-color: dodgerblue;
@@ -105,5 +107,6 @@ body {
 @keyframes flash {
   100% {
     background-color: white;
+    border-color: white;
   }
 }
