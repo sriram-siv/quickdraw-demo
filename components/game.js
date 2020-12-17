@@ -1,8 +1,8 @@
 import { node, hasUpdated } from '../scripts/draw.js'
 import { board, info, pauseMenu } from '../scripts/components.js'
 
-export const game = state => {
-  if (!hasUpdated(state, Object.keys(state.now))) {
+export const game = (state, deps) => {
+  if (!hasUpdated(state, deps)) {
     return document.querySelector('.game')
   }
 

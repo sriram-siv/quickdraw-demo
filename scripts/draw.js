@@ -26,19 +26,7 @@ export const useState = (initial, app, debug) => {
   // Initial draw
   inject(state, app, root)
 
-  if (debug) {
-    const activeKeys = {}
-    window.addEventListener('keydown', ({ key }) => {
-      if (!activeKeys[key]) {
-        activeKeys[key] = true
-        if (debug.keys.every(val => activeKeys[val])) {
-          debug.callback()
-          debugMode(state)
-        }
-      }
-    })
-    window.addEventListener('keyup', ({ key }) => activeKeys[key] = false)
-  }
+  if (debug) debugInit(state, debug)
 
   return state
 }
@@ -53,6 +41,7 @@ export const inject = (state, app, root, profile) => {
 // could call this initalise debug
 // and block keypresses through state.debug
 export const debugMode = state => {
+  // if (!state.debug) return
   const historyLength = state.history.length - 1
   let step = historyLength
   
@@ -61,12 +50,32 @@ export const debugMode = state => {
       state.set(state.history[--step], false)
     }
   })
-} 
+}
+
+export const debugInit = (state, { keys, callback }) => {
+  const activeKeys = {}
+  window.addEventListener('keydown', ({ key }) => {
+    if (!activeKeys[key]) {
+      activeKeys[key] = true
+      if (keys.every(val => activeKeys[val])) {
+        callback()
+        debugMode(state)
+      }
+    }
+  })
+  window.addEventListener('keyup', ({ key }) => {
+    activeKeys[key] = false
+    // if (keys.every(val => !activeKeys[val])) state.set({ debug: false })
+  })
+}
 
 export const node = ({ type, className, style, events } = {}, children) => {
   // Could change this to allow for fragments
   const element = document.createElement(type || 'div')
-  if (className) element.classList.add(className)
+  if (className) {
+    className.split(' ').forEach(singleClass => element.classList.add(singleClass))
+    // element.classList.add(className)
+  }
   if (style) {
     Object.keys(style).forEach(property => element.style[property] = style[property])
   }
