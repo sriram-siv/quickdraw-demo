@@ -8,4 +8,4 @@
 
 * defining apps through config files - objects.js, config.js (controller, init state)
 
-testing ignore function
+testing ignore function again
