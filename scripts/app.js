@@ -15,21 +15,7 @@ import {
   gameLoop
 } from './logic.js'
 
-import { keyRegister } from './controller.js'
-
 const init = () => {
-  // TODO
-  // Improve kicks
-  // Clear key timers on pause
-
-  // Controller intialises using a config file
-  // controller.js
-  // Pass state to controller?
-
-  // Why is state updating when moving against a wall? and no visible change
-  // Blocks can teleport when switching still
-  // When speed is fast - falling block only changes after unpause and at the same time as the block is switched
-
 
   const toggleTimer = () => state.set(pause(() => gameLoop(state), state.now))
 
@@ -48,11 +34,11 @@ const init = () => {
     },
     tetris,
     { keys: ['Control', '/'], callback: toggleTimer }
+    // TODO Initialise controller here
   )
 
-  // if this wasnt here, useState wouldnt need a return value
-  // controller uses it too
-  // Maybe move this to game component // or app component with initialise function
+  // If this wasnt here, useState wouldnt need a return value
+  // Could be called in tetris.js - initialise
   toggleTimer()
 
   const controller = generateController({
@@ -67,15 +53,10 @@ const init = () => {
     Escape: [() => gameLoop(state), 1000, pause]
   })
 
-  // const isKeyActive = keyRegister()
-  // window.history.replaceState(null, null, /route/)
-  // document.title = 'QuickDraw'
-
   window.addEventListener('keyup', ({ key }) => {
     clearInterval(controller.get(key))
     controller.clear(key, null)
   })
-
 
   window.addEventListener('keydown', ({ key }) => {
 

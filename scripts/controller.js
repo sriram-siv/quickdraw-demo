@@ -1,4 +1,3 @@
-// Globally accessible registry of active keys
 export const keyRegister = () => {
   const keys = {}
   

@@ -1,6 +1,8 @@
-import { node, hasUpdated } from './draw.js'
-import { getLine, ghost, pause, gameLoop } from './logic.js'
-import { styles } from './objects.js'
+import { node, hasUpdated } from '../scripts/draw.js'
+import { getLine, ghost } from '../scripts/logic.js'
+import { styles } from '../scripts/objects.js'
+
+// TODO break this file out into single components
 
 export const board = (state, deps) => {
 
@@ -136,41 +138,4 @@ export const info = (state, deps) => {
       preview(state, [], { className: 'hold', piece: 'holdPiece' })
     ]
   )
-}
-
-export const pauseMenu = (state, deps) => {
-  const className = 'pause-menu'
-  if (!hasUpdated(state, deps)) {
-    return document.querySelector(`.${className}`) || ''
-  }
-
-  const unpause = () => state.set(pause(() => gameLoop(state), state.now))
-
-  const restart = () => {
-    state.set(state.history[0])
-    unpause()
-  }
-
-  return !state.now.timer
-    ? node(
-      { className },
-      [
-        node({ type: 'p', className: 'pause-title' }, ['PAUSED']),
-        node({
-          className: 'bezel',
-          type: 'button',
-          events: [['click', unpause]]
-        },
-        ['resume'],
-        ),
-        node({
-          className: 'bezel',
-          type: 'button',
-          events: [['click', restart]]
-        },
-        ['restart'],
-        )
-      ]
-    )
-    : ''
 }
