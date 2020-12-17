@@ -1,32 +1,37 @@
-
-
-
-
-
-
 /**
  * Injects app into DOM and calls first draw
  * Returns a state object : { last, now, set }
  * @param {{}} initial state
  * @param {Function} app
  */
-export const useState = (initial, app, debug) => {
+export const useState = (initial = {}, app, debugOpts = {}) => {
+  if (!app) return
   const root = document.querySelector('body')
   const state = {
     last: {},
     now: initial,
-    history: [{ ...initial }],
-    set: (next, append = true) => {
+    set: next => {
       state.last = { ...state.now }
       state.now = Object.assign(state.now, next)
-      if (append) state.history.push({ ...state.now })
+      state.debug.history.push({ ...state.now })
       inject(state, app, root) // add true as last arg to get performance data in console
+    },
+    debug: {
+      active: false,
+      history: [{ ... initial }],
+      step: null,
+      move: position => {
+        state.last = { ...state.now }
+        state.now = { ...state.debug.history[position] }
+        state.debug.step = position
+        inject(state, app, root)
+      }
     }
   }
+  debugInit(state, debugOpts)
+
   // Initial draw
   inject(state, app, root)
-
-  if (debug) debugInit(state, debug)
 
   return state
 }
@@ -37,35 +42,35 @@ export const inject = (state, app, root, profile) => {
   if (profile) console.log(performance.now() - t0)
 }
 
-// TODO turn off
-// could call this initalise debug
-// and block keypresses through state.debug
-export const debugMode = state => {
-  // if (!state.debug) return
-  const historyLength = state.history.length - 1
-  let step = historyLength
-  
-  window.addEventListener('keydown', ({ key }) => {
-    if (key === 'ArrowLeft') {
-      state.set(state.history[--step], false)
-    }
-  })
-}
-
 export const debugInit = (state, { keys, callback }) => {
+  if (!keys) return
   const activeKeys = {}
   window.addEventListener('keydown', ({ key }) => {
     if (!activeKeys[key]) {
       activeKeys[key] = true
       if (keys.every(val => activeKeys[val])) {
+        state.debug.active = !state.debug.active
+        if (state.debug.active) console.log(state.debug.history)
+        state.debug.move(state.debug.history.length - 1)
         callback()
-        debugMode(state)
       }
     }
   })
   window.addEventListener('keyup', ({ key }) => {
     activeKeys[key] = false
-    // if (keys.every(val => !activeKeys[val])) state.set({ debug: false })
+  })
+  window.addEventListener('keydown', ({ key }) => {
+    if (!state.debug.active) return
+    if (key === '/') console.log(`state[${state.debug.step}]:`, state.now)
+    const stepValues = {
+      ArrowLeft: state.debug.step - 1,
+      ArrowRight: state.debug.step + 1,
+      ArrowUp: state.debug.history.length - 1,
+      ArrowDown: 0
+    }
+    if (stepValues[key] === undefined) return
+    const position = Math.max(0, Math.min(stepValues[key], state.debug.history.length - 1))
+    state.debug.move(position)
   })
 }
 

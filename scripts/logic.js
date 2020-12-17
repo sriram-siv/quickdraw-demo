@@ -168,7 +168,7 @@ export const pause = (loopFunction, prevState) => {
 
   return {
     ...prevState,
-    timer: prevState.timer ? null : setInterval(loopFunction, delay)
+    timer: prevState.timer && prevState.timer !== 'debug' ? null : setInterval(loopFunction, delay)
   }
 }
 

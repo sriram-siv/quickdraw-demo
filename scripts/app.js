@@ -15,18 +15,23 @@ import {
   gameLoop
 } from './logic.js'
 
+import { keyRegister } from './controller.js'
+
 const init = () => {
   // TODO
   // Improve kicks
   // Clear key timers on pause
+
   // Controller intialises using a config file
+  // controller.js
   // Pass state to controller?
+
   // Why is state updating when moving against a wall? and no visible change
   // Blocks can teleport when switching still
   // When speed is fast - falling block only changes after unpause and at the same time as the block is switched
 
-  // Doesnt quite work as it can unpause from menu on debug
-  const pauseGame = () => state.set(pause(() => gameLoop(state), state.now))
+
+  const toggleTimer = () => state.set(pause(() => gameLoop(state), state.now))
 
   // Define initial state (available to all children) and inject app into DOM
   const state = useState(
@@ -42,13 +47,13 @@ const init = () => {
       timer: 0
     },
     tetris,
-    { keys: ['Control', '/'], callback: pauseGame }
+    { keys: ['Control', '/'], callback: toggleTimer }
   )
 
   // if this wasnt here, useState wouldnt need a return value
   // controller uses it too
   // Maybe move this to game component // or app component with initialise function
-  pauseGame()
+  toggleTimer()
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],
@@ -62,12 +67,19 @@ const init = () => {
     Escape: [() => gameLoop(state), 1000, pause]
   })
 
+  // const isKeyActive = keyRegister()
+  // window.history.replaceState(null, null, /route/)
+  // document.title = 'QuickDraw'
+
   window.addEventListener('keyup', ({ key }) => {
     clearInterval(controller.get(key))
     controller.clear(key, null)
   })
 
+
   window.addEventListener('keydown', ({ key }) => {
+
+    if (state.debug.active) return
     // Only allow unpause in paused state
     if (key !== 'Escape' && !state.now.timer) return
     
@@ -82,6 +94,8 @@ const init = () => {
       }, delay)
     }
   })
+
+
 }
 
 window.addEventListener('DOMContentLoaded', init)

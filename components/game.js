@@ -6,6 +6,7 @@ export const game = (state, deps) => {
     return document.querySelector('.game')
   }
 
+
   return node(
     { className: 'game' },
     [
