@@ -7,23 +7,13 @@ export const rotateArray = (array, direction) => {
   return direction === 1 ? result : result.map(line => line.reverse()).reverse()
 }
 
-// Could refactor this to just be an int and then call styles.blockColors when necessary
+// TODO Could refactor this to just be an int and then call styles.blockColors when necessary
 export const getBlock = () => {
   const random = Math.floor(Math.random() * tetrominoes.length)
   return {
     block: tetrominoes[random], color: styles.blockColors[random]
   }
 }
-
-// export const generateController = bindings => {
-//   const keys = {}
-//   return {
-//     get: (key) => keys[key],
-//     set: (key, timer, delay) => keys[key] = startInterval(timer, delay),
-//     clear: key => keys[key] = null,
-//     bindings
-//   }
-// }
 
 export const startInterval = (func, interval) => {
   func()
@@ -116,8 +106,7 @@ export const move = (translation, prevState) => {
     ? prevState
     : placePiece({
       ...prevState,
-      fallingPosition: prevState.fallingPosition += translation,
-      offset
+      fallingPosition: prevState.fallingPosition += translation
     })
 }
 

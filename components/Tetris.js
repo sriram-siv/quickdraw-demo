@@ -1,4 +1,3 @@
-// import { gameLoop, pause } from '../scripts/logic.js'
 import TitleScreen from './TitleScreen.js'
 import Game from './Game.js'
 
