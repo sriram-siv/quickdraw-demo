@@ -34,7 +34,7 @@ const init = () => {
       timer: 0
     },
     tetris,
-    { keys: ['Control', '/'], callback: toggleTimer }
+    toggleTimer
     // TODO Initialise controller here
   )
 
@@ -60,7 +60,6 @@ const init = () => {
   })
 
   window.addEventListener('keydown', ({ key }) => {
-
     if (state.debug.active) return
     // Only allow unpause in paused state
     if (key !== 'Escape' && !state.now.timer) return
