@@ -1,4 +1,4 @@
-import { node, hasUpdated } from '../scripts/draw.js'
+import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { board, info } from './components.js'
 import pauseMenu from './pauseMenu.js'
 

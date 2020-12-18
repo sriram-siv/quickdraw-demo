@@ -1,4 +1,4 @@
-import { node, hasUpdated } from '../scripts/draw.js'
+import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { getLine, ghost } from '../scripts/logic.js'
 import { styles } from '../scripts/objects.js'
 

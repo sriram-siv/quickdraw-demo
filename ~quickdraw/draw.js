@@ -1,10 +1,13 @@
+import { initController, initKeyRegister } from './controller.js'
+import { initDebug } from './debug.js'
+
 /**
  * Injects app into DOM and calls first draw
  * Returns a state object : { last, now, set }
  * @param {{}} initial state
  * @param {Function} app
  */
-export const useState = (app, initial = {}, debugOpts) => {
+export const initialize = ({ app, initial = {}, controls, historyLength, debugOpts }) => {
   if (!app) return
   const root = document.querySelector('body')
   const state = {
@@ -13,8 +16,12 @@ export const useState = (app, initial = {}, debugOpts) => {
     set: next => {
       state.last = { ...state.now }
       state.now = Object.assign(state.now, next)
-      state.history.push({ ...state.now })
-      inject(state, app, root) // add true as last arg to get performance data in console
+      
+      const slicePosition = Math.max(0, state.history.length - (historyLength ?? Infinity) + 1)
+      state.history = [...state.history.slice(slicePosition), { ...state.now }]
+      
+      // add true as last arg to get performance data in console
+      inject(state, app, root, true)
     },
     history: [{ ... initial }],
     debug: {
@@ -27,11 +34,13 @@ export const useState = (app, initial = {}, debugOpts) => {
         inject(state, app, root)
       }
     },
-    keyRegister: {}
+    keyRegister: {},
+    controller: {}
   }
 
-  keyRegisterInit(state)
-  debugInit(state, debugOpts)
+  initKeyRegister(state)
+  initController(state, controls)
+  initDebug(state, debugOpts)
 
   // Initial draw
   inject(state, app, root)
@@ -43,49 +52,6 @@ export const inject = (state, app, root, profile) => {
   const t0 = performance.now()
   root.children[0].replaceWith(app(state))
   if (profile) console.log(performance.now() - t0)
-}
-
-export const debugInit = (state, opts) => {
-  if (!opts?.debug) return
-
-  const activationKeys = ['Control', '/']
-  const printState = '/'
-
-  window.addEventListener('keydown', ({ key }) => {
-    if (activationKeys.every(val => state.keyRegister[val])) {
-      state.debug.active = !state.debug.active
-      if (state.debug.active) console.log(state.history)
-      state.debug.move(state.history.length - 1)
-      opts.callback()
-    }
-    if (state.debug.active) {
-      if (key === printState) console.log(`state[${state.debug.step}]:`, state.now)
-      const stepValues = {
-        ArrowLeft: state.debug.step - 1,
-        ArrowRight: state.debug.step + 1,
-        ArrowUp: state.history.length - 1,
-        ArrowDown: 0
-      }
-      if (stepValues[key] === undefined) return
-      const position = Math.max(0, Math.min(stepValues[key], state.history.length - 1))
-      state.debug.move(position)
-    }
-  })
-}
-
-export const keyRegisterInit = ({ keyRegister }) => {
-  window.addEventListener('keydown', ({ key, location }) => {
-    if (keyRegister[key] === undefined) {
-      keyRegister[key] = 0
-    }
-    if (!location) keyRegister[key] = 1
-    else {
-      keyRegister[key]++
-    }
-  })
-  window.addEventListener('keyup', ({ key }) => {
-    keyRegister[key] = Math.max(0, keyRegister[key] - 1)
-  })
 }
 
 export const node = ({ type, className, style, events } = {}, children) => {

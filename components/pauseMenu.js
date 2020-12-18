@@ -1,4 +1,4 @@
-import { node, hasUpdated } from '../scripts/draw.js'
+import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { gameLoop, pause, getBlock } from '../scripts/logic.js'
 
 const pauseMenu = (state, deps) => {

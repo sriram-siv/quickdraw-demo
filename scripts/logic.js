@@ -111,11 +111,13 @@ export const placePiece = prevState => {
 
 export const move = (translation, prevState) => {
   const offset = findOffset(prevState.fallingPiece, translation, prevState)
+
   return offset === false
     ? prevState
     : placePiece({
       ...prevState,
-      fallingPosition: prevState.fallingPosition += translation
+      fallingPosition: prevState.fallingPosition += translation,
+      offset
     })
 }
 
@@ -183,7 +185,8 @@ export const updateScore = prevState => {
   }
 }
 
-export const controllerMoveValid = (current, next) => {
+// Called on interval delayed controller moves to avoid timing issues
+export const isMoveValid = (current, next) => {
   // newStates cells must be rechecked due to asynchronous call
   const placementMap = getPlacementMap(next.fallingPiece, next.fallingPosition)
   const isOutOfBounds = placementMap.some(i => i >= 210)
@@ -191,7 +194,12 @@ export const controllerMoveValid = (current, next) => {
   const hasCloned = current.cells.every(cell => cell?.value !== 1)
     && next.cells.some(cell => cell.value === 1)
   
+  // if (isOutOfBounds || hasCollided || hasCloned) {
+  //   console.log({ isOutOfBounds, hasCollided, hasCloned })
+  // }
+  
   return !isOutOfBounds && !hasCollided && !hasCloned
+    ? next : {}
 }
 
 export const gameLoop = state => {

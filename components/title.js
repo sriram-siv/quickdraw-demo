@@ -1,4 +1,4 @@
-import { node } from '../scripts/draw.js'
+import { node } from '../~quickdraw/draw.js'
 import { gameLoop } from '../scripts/logic.js'
 
 const title = state => {
