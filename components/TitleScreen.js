@@ -1,8 +1,7 @@
 import { node } from '../~quickdraw/draw.js'
 import { gameLoop } from '../scripts/logic.js'
 
-const title = state => {
-
+const TitleScreen = state => {
 
   const startGame = () => state.set({
     screen: 'game',
@@ -26,4 +25,4 @@ const title = state => {
   )
 }
 
-export default title
+export default TitleScreen

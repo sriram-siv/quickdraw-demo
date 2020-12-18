@@ -1,7 +1,7 @@
 import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { gameLoop, pause, getBlock } from '../scripts/logic.js'
 
-const pauseMenu = (state, deps) => {
+const PauseMenu = (state, deps) => {
   const className = 'pause-menu'
   if (!hasUpdated(state, deps)) {
     return document.querySelector(`.${className}`) || ''
@@ -54,4 +54,4 @@ const pauseMenu = (state, deps) => {
     : ''
 }
 
-export default pauseMenu
+export default PauseMenu

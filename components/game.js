@@ -1,8 +1,9 @@
 import { node, hasUpdated } from '../~quickdraw/draw.js'
-import { board, info } from './components.js'
-import pauseMenu from './pauseMenu.js'
+import Board from './Board.js'
+import Info from './Info.js'
+import PauseMenu from './PauseMenu.js'
 
-const game = (state, deps) => {
+const Game = (state, deps) => {
   if (!hasUpdated(state, deps)) {
     return document.querySelector('.game')
   }
@@ -10,11 +11,11 @@ const game = (state, deps) => {
   return node(
     { className: 'game' },
     [
-      board(state, ['screen', 'cells', 'newLines']),
-      info(state, ['screen', 'lines', 'score', 'nextPiece', 'holdPiece']),
-      pauseMenu(state, ['timer'])
+      Board(state, ['screen', 'cells', 'newLines']),
+      Info(state, ['screen', 'lines', 'score', 'nextPiece', 'holdPiece']),
+      PauseMenu(state, ['timer'])
     ]
   )
 }
 
-export default game
+export default Game
