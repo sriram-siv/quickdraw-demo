@@ -4,7 +4,7 @@
  * @param {{}} initial state
  * @param {Function} app
  */
-export const useState = (initial = {}, app, debugCallback) => {
+export const useState = (app, initial = {}, debugOpts) => {
   if (!app) return
   const root = document.querySelector('body')
   const state = {
@@ -19,8 +19,6 @@ export const useState = (initial = {}, app, debugCallback) => {
     history: [{ ... initial }],
     debug: {
       active: false,
-      // History might be better placed outside of debug so that it is accessible to components without exposing debug
-      // history: [{ ... initial }],
       step: null,
       move: position => {
         state.last = { ...state.now }
@@ -33,7 +31,7 @@ export const useState = (initial = {}, app, debugCallback) => {
   }
 
   keyRegisterInit(state)
-  debugInit(state, debugCallback)
+  debugInit(state, debugOpts)
 
   // Initial draw
   inject(state, app, root)
@@ -47,16 +45,18 @@ export const inject = (state, app, root, profile) => {
   if (profile) console.log(performance.now() - t0)
 }
 
-export const debugInit = (state, callback) => {
-  if (!callback) return
+export const debugInit = (state, opts) => {
+  if (!opts?.debug) return
+
   const activationKeys = ['Control', '/']
   const printState = '/'
+
   window.addEventListener('keydown', ({ key }) => {
     if (activationKeys.every(val => state.keyRegister[val])) {
       state.debug.active = !state.debug.active
       if (state.debug.active) console.log(state.history)
       state.debug.move(state.history.length - 1)
-      callback()
+      opts.callback()
     }
     if (state.debug.active) {
       if (key === printState) console.log(`state[${state.debug.step}]:`, state.now)

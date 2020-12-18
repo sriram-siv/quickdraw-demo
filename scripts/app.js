@@ -19,10 +19,13 @@ const init = () => {
 
   const toggleTimer = () => state.set(pause(() => gameLoop(state), state.now))
 
-  // Define initial state (available to all children) and inject app into DOM
-  // Third argument is the debug settings
+  // Return value not needed currently
   const state = useState(
+    // Top level App
+    tetris,
+    // Initial state
     {
+      screen: 'title',
       cells: Array.from({ length: 210 }, () => ({ ...newCell })),
       fallingPosition: 4,
       fallingPiece: getBlock(),
@@ -33,14 +36,12 @@ const init = () => {
       newLines: [],
       timer: 0
     },
-    tetris,
-    toggleTimer
+    // History options
+    // { history: true, length: auto }
+    // Debug Options
+    { debug: true, callback: toggleTimer }
     // TODO Initialise controller here
   )
-
-  // If this wasnt here, useState wouldnt need a return value
-  // Could be called in tetris.js - initialise
-  toggleTimer()
 
   const controller = generateController({
     ArrowLeft: [-1, 100, move],

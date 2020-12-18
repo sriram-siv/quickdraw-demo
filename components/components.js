@@ -5,20 +5,21 @@ import { styles } from '../scripts/objects.js'
 // TODO break this file out into single components
 
 export const board = (state, deps) => {
-
-
+  
   // TODO fit this in line with general pattern
-
+  
   const element = document.querySelector('.game-well')
+  
   if (!hasUpdated(state, deps)) {
     return element
   }
-
+  
   const { cells: prevCells, newLines: prevNewLines } = state.last
   const { cells, newLines } = state.now
 
   // Initialize
-  if (!prevCells) {
+  if (!element || !prevCells) {
+    console.log('intialise')
     return node(
       { className: 'game-well' },
       Array.from({ length: 200 }, () => (

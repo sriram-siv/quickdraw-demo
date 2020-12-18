@@ -10,7 +10,7 @@ export const game = (state, deps) => {
   return node(
     { className: 'game' },
     [
-      board(state, ['cells', 'newLines']),
+      board(state, ['screen', 'cells', 'newLines']),
       info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
       pauseMenu(state, ['timer'])
     ]
