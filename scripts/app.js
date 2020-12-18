@@ -20,6 +20,7 @@ const init = () => {
   const toggleTimer = () => state.set(pause(() => gameLoop(state), state.now))
 
   // Define initial state (available to all children) and inject app into DOM
+  // Third argument is the debug settings
   const state = useState(
     {
       cells: Array.from({ length: 210 }, () => ({ ...newCell })),

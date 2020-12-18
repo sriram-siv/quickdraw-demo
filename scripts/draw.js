@@ -13,20 +13,23 @@ export const useState = (initial = {}, app, debugOpts = {}) => {
     set: next => {
       state.last = { ...state.now }
       state.now = Object.assign(state.now, next)
-      state.debug.history.push({ ...state.now })
+      state.history.push({ ...state.now })
       inject(state, app, root) // add true as last arg to get performance data in console
     },
+    history: [{ ... initial }],
     debug: {
       active: false,
-      history: [{ ... initial }],
+      // History might be better placed outside of debug so that it is accessible to components without exposing debug
+      // history: [{ ... initial }],
       step: null,
       move: position => {
         state.last = { ...state.now }
-        state.now = { ...state.debug.history[position] }
+        state.now = { ...state.history[position] }
         state.debug.step = position
         inject(state, app, root)
       }
-    }
+    },
+    keyRegister: {}
   }
   debugInit(state, debugOpts)
 
@@ -50,8 +53,8 @@ export const debugInit = (state, { keys, callback }) => {
       activeKeys[key] = true
       if (keys.every(val => activeKeys[val])) {
         state.debug.active = !state.debug.active
-        if (state.debug.active) console.log(state.debug.history)
-        state.debug.move(state.debug.history.length - 1)
+        if (state.debug.active) console.log(state.history)
+        state.debug.move(state.history.length - 1)
         callback()
       }
     }
@@ -65,11 +68,11 @@ export const debugInit = (state, { keys, callback }) => {
     const stepValues = {
       ArrowLeft: state.debug.step - 1,
       ArrowRight: state.debug.step + 1,
-      ArrowUp: state.debug.history.length - 1,
+      ArrowUp: state.history.length - 1,
       ArrowDown: 0
     }
     if (stepValues[key] === undefined) return
-    const position = Math.max(0, Math.min(stepValues[key], state.debug.history.length - 1))
+    const position = Math.max(0, Math.min(stepValues[key], state.history.length - 1))
     state.debug.move(position)
   })
 }

@@ -88,7 +88,7 @@ export const preview = (state, _, { className, piece }) => {
           }
         },
         next[piece]?.block.flat().map(cell => (
-          node({ className: 'block', style: { backgroundColor: cell ? next[piece].color : styles.background } })
+          node({ className: cell ? 'block bezel' : 'block', style: { backgroundColor: cell ? next[piece].color : styles.background } })
         ))
       )
     ]
