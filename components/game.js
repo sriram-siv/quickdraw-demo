@@ -11,7 +11,7 @@ export const game = (state, deps) => {
     { className: 'game' },
     [
       board(state, ['screen', 'cells', 'newLines']),
-      info(state, ['lines', 'score', 'nextPiece', 'holdPiece']),
+      info(state, ['screen', 'lines', 'score', 'nextPiece', 'holdPiece']),
       pauseMenu(state, ['timer'])
     ]
   )

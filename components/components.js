@@ -14,12 +14,11 @@ export const board = (state, deps) => {
     return element
   }
   
-  const { cells: prevCells, newLines: prevNewLines } = state.last
+  const { newLines: prevNewLines } = state.last
   const { cells, newLines } = state.now
 
   // Initialize
-  if (!element || !prevCells) {
-    console.log('intialise')
+  if (!element) {
     return node(
       { className: 'game-well' },
       Array.from({ length: 200 }, () => (
@@ -134,7 +133,7 @@ export const info = (state, deps) => {
   return node(
     { className },
     [
-      playerData(state, ['lines', 'score']),
+      playerData(state, ['screen', 'lines', 'score']),
       preview(state, [], { className: 'next', piece: 'nextPiece' }),
       preview(state, [], { className: 'hold', piece: 'holdPiece' })
     ]

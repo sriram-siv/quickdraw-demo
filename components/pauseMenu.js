@@ -1,5 +1,5 @@
 import { node, hasUpdated } from '../scripts/draw.js'
-import { gameLoop, pause } from '../scripts/logic.js'
+import { gameLoop, pause, getBlock } from '../scripts/logic.js'
 
 const pauseMenu = (state, deps) => {
   const className = 'pause-menu'
@@ -10,8 +10,17 @@ const pauseMenu = (state, deps) => {
   const unpause = () => state.set(pause(() => gameLoop(state), state.now))
 
   const restart = () => {
-    state.set(state.history[0])
+    state.set({
+      ...state.history[0],
+      screen: 'game',
+      fallingPiece: getBlock(),
+      nextPiece: getBlock()
+    })
     unpause()
+  }
+
+  const quit = () => {
+    state.set(state.history[0])
   }
 
   return !state.now.timer
@@ -32,6 +41,13 @@ const pauseMenu = (state, deps) => {
           events: [['click', restart]]
         },
         ['restart'],
+        ),
+        node({
+          className: 'bezel',
+          type: 'button',
+          events: [['click', quit]]
+        },
+        ['quit'],
         )
       ]
     )
