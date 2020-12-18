@@ -8,7 +8,7 @@ export const board = (state, deps) => {
   
   // TODO fit this in line with general pattern
   
-  const element = document.querySelector('.game-well')
+  let element = document.querySelector('.game-well')
   
   if (!hasUpdated(state, deps)) {
     return element
@@ -19,7 +19,7 @@ export const board = (state, deps) => {
 
   // Initialize
   if (!element) {
-    return node(
+    element = node(
       { className: 'game-well' },
       Array.from({ length: 200 }, () => (
         node({ className: 'block', style: { backgroundColor: styles.background } })

@@ -1,5 +1,5 @@
-export const initDebug = (state, opts) => {
-  if (!opts?.use) return
+export const initDebug = (state, callback) => {
+  if (!callback) return
 
   const activationKeys = ['Control', '/']
   const printState = '/'
@@ -8,7 +8,7 @@ export const initDebug = (state, opts) => {
     if (activationKeys.every(val => state.keyRegister[val])) {
       state.debug.active = !state.debug.active
       state.debug.move(state.history.length - 1)
-      state.set(opts.callback())
+      state.set(callback())
       if (state.debug.active) console.log(state.history)
     }
     if (state.debug.active) {

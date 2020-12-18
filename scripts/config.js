@@ -1,5 +1,5 @@
 import * as quickdraw from '../~quickdraw/draw.js'
-import { tetris } from '../components/tetris.js'
+import { tetris } from '../components/app.js'
 import { newCell } from './objects.js'
 
 import {
@@ -42,12 +42,9 @@ const init = () => {
       Escape: [() => gameLoop(state), 1000, pause]
     },
     // historyLength: 32, auto sets to infinite
-    debugOpts: {
-      use: true,
-      callback: () => {
-        clearInterval(state.now.timer)
-        state.set({ timer: null })
-      }
+    debugCallback: () => {
+      clearInterval(state.now.timer)
+      state.set({ timer: null })
     }
   })
 }

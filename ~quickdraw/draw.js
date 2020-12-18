@@ -7,7 +7,7 @@ import { initDebug } from './debug.js'
  * @param {{}} initial state
  * @param {Function} app
  */
-export const initialize = ({ app, initial = {}, controls, historyLength, debugOpts }) => {
+export const initialize = ({ app, initial = {}, controls, historyLength, debugCallback }) => {
   if (!app) return
   const root = document.querySelector('body')
   const state = {
@@ -20,8 +20,8 @@ export const initialize = ({ app, initial = {}, controls, historyLength, debugOp
       const slicePosition = Math.max(0, state.history.length - (historyLength ?? Infinity) + 1)
       state.history = [...state.history.slice(slicePosition), { ...state.now }]
       
-      // add true as last arg to get performance data in console
-      inject(state, app, root, true)
+      // inject(state, app, root, true) // Log performance data
+      inject(state, app, root)
     },
     history: [{ ... initial }],
     debug: {
@@ -40,7 +40,7 @@ export const initialize = ({ app, initial = {}, controls, historyLength, debugOp
 
   initKeyRegister(state)
   initController(state, controls)
-  initDebug(state, debugOpts)
+  initDebug(state, debugCallback)
 
   // Initial draw
   inject(state, app, root)

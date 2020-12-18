@@ -15,15 +15,15 @@ export const getBlock = () => {
   }
 }
 
-export const generateController = bindings => {
-  const keys = {}
-  return {
-    get: (key) => keys[key],
-    set: (key, timer, delay) => keys[key] = startInterval(timer, delay),
-    clear: key => keys[key] = null,
-    bindings
-  }
-}
+// export const generateController = bindings => {
+//   const keys = {}
+//   return {
+//     get: (key) => keys[key],
+//     set: (key, timer, delay) => keys[key] = startInterval(timer, delay),
+//     clear: key => keys[key] = null,
+//     bindings
+//   }
+// }
 
 export const startInterval = (func, interval) => {
   func()

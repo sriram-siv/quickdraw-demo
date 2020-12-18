@@ -2,7 +2,7 @@ import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { board, info } from './components.js'
 import pauseMenu from './pauseMenu.js'
 
-export const game = (state, deps) => {
+const game = (state, deps) => {
   if (!hasUpdated(state, deps)) {
     return document.querySelector('.game')
   }
@@ -16,3 +16,5 @@ export const game = (state, deps) => {
     ]
   )
 }
+
+export default game
