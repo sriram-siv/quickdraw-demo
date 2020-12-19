@@ -89,14 +89,16 @@ export const hasUpdated = ({ last, now }, dependencies) => (
     const prevValue = stateValue(last, key)
     const nextValue = stateValue(now, key)
     const nextKeys = Object.keys(nextValue)
+
     
-    return typeof(nextValue) === 'object'
-      ? prevValue.length !== nextValue.length || hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
+    return typeof (nextValue) === 'object'
+      // ? prevValue.length !== nextValue.length || hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
+      ? hasUpdated({ last: prevValue, now: nextValue }, nextKeys)
       : prevValue !== nextValue
   })
 )
 
 // can take a nested key in the form < 'key.subKey' >
-export const stateValue = (state, keys) => {
-  return keys.split('.').reduce((acc, key) => acc[key] ?? [], state)
-}
+export const stateValue = (state, keys) => (
+  keys.split('.').reduce((acc, key) => acc[key] ?? '__novalue__', state)
+)

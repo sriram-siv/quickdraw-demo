@@ -21,6 +21,7 @@ const TitleScreen = state => {
       'TETRIS',
       node(
         {
+          className: 'bezel',
           type: 'button',
           events: [['click', startGame]]
         },

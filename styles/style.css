@@ -4,6 +4,18 @@ body {
   font-family: Helvetica, Arial, sans-serif;
 }
 
+button {
+  width: calc(4.75vh * 5);
+  margin: 5px;
+  padding: 10px;
+  font-size: 1rem;
+  background-color: lightblue;
+  color: #333;
+}
+button:hover {
+  background-color: dodgerblue;
+}
+
 .bezel {
   box-sizing: border-box;
   border: 2px solid #0003;
@@ -14,6 +26,19 @@ body {
 .block {
   width: 4.75vh;
   height: 4.75vh;
+}
+
+.title-screen {
+  box-sizing: border-box;
+  width: calc(4.75vh * 10 + 25vh + 10px);
+  height: 95vh;
+  background-color: white;
+  margin: 2.5vh auto;
+  padding: calc(4.75vh * 3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 2rem;
 }
 
 .game {
@@ -79,17 +104,6 @@ body {
 .pause-menu .pause-title {
   font-size: 1.5rem;
   margin: 8vh auto 5vh;
-}
-.pause-menu button {
-  width: 50%;
-  margin: 5px;
-  padding: 10px;
-  font-size: 1rem;
-  background-color: lightblue;
-  color: #333;
-}
-.pause-menu button:hover {
-  background-color: dodgerblue;
 }
 
 @keyframes flash {
