@@ -25,7 +25,7 @@ body {
   margin: auto;
 }
 
-.game-well {
+.board {
   display: flex;
   flex-wrap: wrap;
   width: 47.5vh;

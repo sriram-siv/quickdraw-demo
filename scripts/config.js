@@ -1,6 +1,5 @@
 import * as quickdraw from '../~quickdraw/draw.js'
 import Tetris from '../components/Tetris.js'
-import { newCell } from './objects.js'
 
 import {
   getBlock,
@@ -18,7 +17,7 @@ const state = quickdraw.initialize({
   app: Tetris,
   initial: {
     screen: 'title',
-    cells: Array.from({ length: 210 }, () => ({ ...newCell })),
+    cells: [],
     fallingPosition: 4,
     fallingPiece: getBlock(),
     nextPiece: getBlock(),

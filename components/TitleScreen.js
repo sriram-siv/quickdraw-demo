@@ -1,12 +1,17 @@
 import { node } from '../~quickdraw/draw.js'
-import { gameLoop } from '../scripts/logic.js'
+import { gameLoop, move } from '../scripts/logic.js'
+import { newCell } from '../scripts/objects.js'
 
 const TitleScreen = state => {
 
-  const startGame = () => state.set({
-    screen: 'game',
-    timer: setInterval(() => gameLoop(state), 1000)
-  })
+  const startGame = () => {
+    state.set({
+      cells: Array.from({ length: 210 }, () => ({ ...newCell })),
+      screen: 'game',
+      timer: setInterval(() => gameLoop(state), 1000)
+    })
+    state.set(move(0, state.now))
+  }
 
   return node(
     {

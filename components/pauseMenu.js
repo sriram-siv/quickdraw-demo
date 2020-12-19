@@ -1,5 +1,6 @@
 import { node, hasUpdated } from '../~quickdraw/draw.js'
 import { gameLoop, pause, getBlock } from '../scripts/logic.js'
+import { newCell } from '../scripts/objects.js'
 
 const PauseMenu = (state, deps) => {
   
@@ -12,12 +13,17 @@ const PauseMenu = (state, deps) => {
 
   const restart = () => {
     state.set({
-      ...state.history[0],
       screen: 'game',
+      cells: Array.from({ length: 210 }, () => ({ ...newCell })),
+      fallingPosition: 4,
       fallingPiece: getBlock(),
-      nextPiece: getBlock()
+      nextPiece: getBlock(),
+      holdPiece: null,
+      lines: 0,
+      score: 0,
+      newLines: [],
+      timer: setInterval(() => gameLoop(state), 1000)
     })
-    unpause()
   }
 
   const quit = () => {

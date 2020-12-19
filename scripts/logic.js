@@ -84,14 +84,23 @@ export const alterCells = (prevValue, newValue, prevState) => ({
   )
 })
 
-// Returns the state with the falling piece removed and replaced at the falling position
+// Returns the state with the falling piece replaced at the falling position
+// Also applies ghost to cellmap
 export const placePiece = prevState => {
   const { fallingPiece, fallingPosition } = prevState
   const spawnMap = getPlacementMap(fallingPiece, fallingPosition)
+  const ghostMap = spawnMap.map(i => i + ghost(prevState))
   
-  const cells = alterCells(1, 0, prevState).cells.map((cell, i) => (
-    spawnMap.includes(i) ? { value: 1, color: fallingPiece.color } : cell
-  ))
+  const cells = alterCells(1, 0, prevState).cells
+    // Remove previous ghost
+    .map(cell => (
+      cell.color === 'lightgrey' ? { ...cell, color: 'white' } : cell
+    ))
+    .map((cell, i) => {
+      if (spawnMap.includes(i)) return { value: 1, color: fallingPiece.color }
+      if (ghostMap.includes(i)) return { ...cell, color: 'lightgrey' }
+      else return cell
+    })
   
   return {
     ...prevState,
@@ -182,10 +191,6 @@ export const isMoveValid = (current, next) => {
   const hasCollided = placementMap.some(i => current.cells[i]?.value === 2)
   const hasCloned = current.cells.every(cell => cell?.value !== 1)
     && next.cells.some(cell => cell.value === 1)
-  
-  // if (isOutOfBounds || hasCollided || hasCloned) {
-  //   console.log({ isOutOfBounds, hasCollided, hasCloned })
-  // }
   
   return !isOutOfBounds && !hasCollided && !hasCloned
     ? next : {}
