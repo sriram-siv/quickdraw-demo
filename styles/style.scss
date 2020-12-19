@@ -38,8 +38,9 @@ body {
 .info {
   width: 25vh;
 
-  .player-data div {
+  .player-data {
     background-color: white;
+    padding: 10px;
     
     p {
       margin: 0;
@@ -72,13 +73,10 @@ body {
 .pause-menu {
   background-color: #aaaa;
   position: absolute;
-  left: calc(23.75vh + 10px);
-  top: calc(4.75vh + 2.5vh);
-  height: 38vh;
-  width: 38vh;
-  transform: translate(-50%, 0%);
-
-  border-radius: 3px;
+  left: calc(#{$block-size} + 10px);
+  top: calc(#{$block-size} + 2.5vh);
+  width: calc(#{$block-size} * 8);
+  height: calc(#{$block-size} * 10);
   
   display: flex;
   flex-direction: column;

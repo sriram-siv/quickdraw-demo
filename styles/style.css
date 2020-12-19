@@ -35,10 +35,11 @@ body {
 .info {
   width: 25vh;
 }
-.info .player-data div {
+.info .player-data {
   background-color: white;
+  padding: 10px;
 }
-.info .player-data div p {
+.info .player-data p {
   margin: 0;
   padding: 10px;
 }
@@ -66,12 +67,10 @@ body {
 .pause-menu {
   background-color: #aaaa;
   position: absolute;
-  left: calc(23.75vh + 10px);
+  left: calc(4.75vh + 10px);
   top: calc(4.75vh + 2.5vh);
-  height: 38vh;
-  width: 38vh;
-  transform: translate(-50%, 0%);
-  border-radius: 3px;
+  width: calc(4.75vh * 8);
+  height: calc(4.75vh * 10);
   display: flex;
   flex-direction: column;
   justify-content: start;

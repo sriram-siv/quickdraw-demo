@@ -57,9 +57,12 @@ export const inject = (state, app, root, profile) => {
 export const node = ({ type, className, style, events } = {}, children) => {
   // Could change this to allow for fragments
   const element = document.createElement(type || 'div')
+
   if (className) {
-    className.split(' ').forEach(singleClass => element.classList.add(singleClass))
-    // element.classList.add(className)
+    className
+      .split(/\s+/)
+      .filter(val => val)
+      .forEach(singleClass => element.classList.add(singleClass))
   }
   if (style) {
     Object.keys(style).forEach(property => element.style[property] = style[property])
@@ -95,5 +98,5 @@ export const hasUpdated = ({ last, now }, dependencies) => (
 
 // can take a nested key in the form < 'key.subKey' >
 export const stateValue = (state, keys) => {
-  return keys.split('.').reduce((acc, key) => state[key] ?? acc, [])
+  return keys.split('.').reduce((acc, key) => acc[key] ?? [], state)
 }

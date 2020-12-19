@@ -3,7 +3,6 @@ import Preview from './Preview.js'
 import PlayerData from './PlayerData.js'
 
 const Info = (state, deps) => {
-
   const className = 'info'
   if (!hasUpdated(state, deps)) {
     return document.querySelector(`.${className}`)

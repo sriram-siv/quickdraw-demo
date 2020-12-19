@@ -3,11 +3,13 @@ import { getLine, ghost } from '../scripts/logic.js'
 import { styles } from '../scripts/objects.js'
 
 const Board = (state, deps) => {
-  
+
   // TODO fit this in line with general pattern
   // Cell component -> each updates according to state.cells[i + 10]
   // How to handle ghost ?
   // Des[ i, i - ghost ] ??
+
+  
   
   let element = document.querySelector('.game-well')
   
@@ -26,6 +28,7 @@ const Board = (state, deps) => {
       ))
     )
   }
+
 
   // Flash lines
   newLines.forEach(lineNumber => {
