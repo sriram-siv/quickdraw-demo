@@ -8,6 +8,7 @@ import { initDebug } from './debug.js'
  * @param {Function} app
  */
 export const initialize = ({ app, initial = {}, controls, historyLength, debugCallback }) => {
+  // Is this starting to look like OOP ??
   if (!app) return
   const root = document.querySelector('body')
   const state = {
@@ -20,7 +21,6 @@ export const initialize = ({ app, initial = {}, controls, historyLength, debugCa
       const slicePosition = Math.max(0, state.history.length - (historyLength ?? Infinity) + 1)
       state.history = [...state.history.slice(slicePosition), { ...state.now }]
       
-      // inject(state, app, root, true) // Log performance data
       inject(state, app, root)
     },
     history: [{ ... initial }],
@@ -39,16 +39,27 @@ export const initialize = ({ app, initial = {}, controls, historyLength, debugCa
   }
 
   initKeyRegister(state)
-  initController(state, controls)
-  initDebug(state, debugCallback)
+  
+  window.addEventListener('keydown', ({ key }) => {
+    // Should these return states ? -> state.set(return val)
+    initController(controls).keyDown(state, key)
+    initDebug(debugCallback).keyDown(state, key)
+  })
+  window.addEventListener('keyup', ({ key }) => {
+    initController(controls).keyUp(state, key)
+  })
 
   // Initial draw
   inject(state, app, root)
 
   return state
+  // TODO return diff object { state.last, state.now, state.set... }
 }
 
-export const inject = (state, app, root, profile) => {
+// All DOM element changes result from this function call
+export const inject = (state, app, root) => {
+  const profile = true
+  // const profile = false
   const t0 = performance.now()
   root.children[0].replaceWith(app(state))
   if (profile) console.log(performance.now() - t0)

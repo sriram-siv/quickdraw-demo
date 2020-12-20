@@ -1,10 +1,11 @@
 import { startInterval } from '../scripts/logic.js'
 
-export const initController = (state, controls) => {
-  window.addEventListener('keydown', ({ key }) => {
+export const initController = (controls) => {
+
+  const keyDown = (state, key) => {
     if (state.debug.active) return
     // Only allow unpause in paused state
-    // This isnt very reusable - could allow for control scheme switching
+    // TODO This isnt very reusable - could allow for control scheme switching
     if (key !== 'Escape' && !state.now.timer) return
 
     if (!state.controller[key] && controls[key]) {
@@ -14,11 +15,14 @@ export const initController = (state, controls) => {
         state.set(action(value, state.now))
       }, delay)
     }
-  })
-  window.addEventListener('keyup', ({ key }) => {
+  }
+
+  const keyUp = (state, key) => {
     clearInterval(state.controller[key])
     state.controller[key] = null
-  })
+  }
+
+  return { keyDown, keyUp }
 }
 
 export const initKeyRegister = ({ keyRegister }) => {

@@ -6,15 +6,15 @@ export const Block = (state, deps, index, element) => {
   // Update
   const cell = state.now.cells[index]
 
-  // console.log(state.now.newLines.includes(20))
-  // console.log(state.now.newLines)
+  // const lineNumber = Math.floor(index / 10)
   
   return node(
     {
       className: `block ${cell.value ? 'bezel' : ''}`,
       style: {
         backgroundColor: cell.color
-        // animation: state.now.newLines.contains()
+        // Animation needs fixing
+        // animation: state.now.newLines.includes(lineNumber) ? 'flash 0.2s' : ''
       }
     }
   )
@@ -29,6 +29,7 @@ const Board = (state, deps) => {
   const blocks = state.now.cells
     .slice(10)
     .map((cell, i) => (
+      // Block(state, [`cells.${i + 10}`, 'newLines'], i + 10, element?.children[i])
       Block(state, [`cells.${i + 10}`], i + 10, element?.children[i])
     ))
 

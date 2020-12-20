@@ -1,10 +1,10 @@
-export const initDebug = (state, callback) => {
+export const initDebug = callback => {
   if (!callback) return
 
   const activationKeys = ['Control', '/']
   const printState = '/'
 
-  window.addEventListener('keydown', ({ key }) => {
+  const keyDown = (state, key) => {
     if (activationKeys.every(val => state.keyRegister[val])) {
       state.debug.active = !state.debug.active
       state.debug.move(state.history.length - 1)
@@ -23,5 +23,6 @@ export const initDebug = (state, callback) => {
       const position = Math.max(0, Math.min(stepValues[key], state.history.length - 1))
       state.debug.move(position)
     }
-  })
+  }
+  return { keyDown }
 }
